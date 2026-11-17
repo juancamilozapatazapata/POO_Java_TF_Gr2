@@ -16,8 +16,8 @@ public final class Empresa extends Cliente{
     /* constructor*/
 
     public Empresa(Contacto suContacto, String numeroIdentificacion, String nombre, String nombreCiudad) {
-        super(numeroIdentificacion, nombre, nombreCiudad);
-        this.suContacto = suContacto;
+        super(numeroIdentificacion, nombre, nombreCiudad);/* llama al constructor de Clientes*/
+        this.suContacto = suContacto; 
     }
     
     /*  get y set*/

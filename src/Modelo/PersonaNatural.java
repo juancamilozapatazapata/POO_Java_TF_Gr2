@@ -17,7 +17,7 @@ public final class PersonaNatural extends Cliente {
     
     public PersonaNatural(String numeroIdentificacion, String nombre, String nombreCiudad,
                           String numeroTelefono, String correoElectronico) {
-        super(numeroIdentificacion, nombre, nombreCiudad);
+        super(numeroIdentificacion, nombre, nombreCiudad); /* <<supper>> */
         this.numeroTelefono = numeroTelefono;
         this.correoElectronico = correoElectronico;
     }
