@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Juan D
  */
-public abstract class Cliente implements Serializable {
+public abstract class Cliente implements Serializable { 
     
     protected String numeroIdentificacion;
     protected String nombre;
