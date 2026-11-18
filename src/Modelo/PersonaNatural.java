@@ -40,7 +40,7 @@ public final class PersonaNatural extends Cliente {
         this.correoElectronico = correoElectronico;
     }
     
-    /* toString*/
+    /* toString*/ 
 
     @Override
     public String toString() {
