@@ -4,11 +4,13 @@
  */
 package Modelo;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Gabriela imbachi
  */
-public  abstract class Cliente {
+public  abstract class Cliente implements Serializable {
     protected String numeroIdentificacion ;
     protected String nombre ;
     protected String nombreCuidad ;

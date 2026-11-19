@@ -10,6 +10,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,6 +30,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import Modelo.Cliente;
+import Modelo.Proyecto;
 
 /**
  *
@@ -104,7 +111,7 @@ public class UsaProyecto extends JFrame {
                 String descripcion = OPCIONES[categoria][indiceOpcion];
                 JMenuItem elemento = new JMenuItem(descripcion);
                 elemento.addActionListener((ActionEvent evento) ->
-                        mostrarPendiente(numeroOpcion, descripcion));
+                        ejecutarOpcion(numeroOpcion, descripcion));
                 menu.add(elemento);
             }
 
@@ -189,7 +196,7 @@ public class UsaProyecto extends JFrame {
             boton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
             boton.setFocusPainted(false);
             boton.addActionListener((ActionEvent evento) ->
-                    mostrarPendiente(numeroOpcion, descripcion));
+                    ejecutarOpcion(numeroOpcion, descripcion));
             tarjeta.add(boton);
             if (i < OPCIONES[indiceCategoria].length - 1) {
                 tarjeta.add(Box.createVerticalStrut(4));
@@ -205,6 +212,176 @@ public class UsaProyecto extends JFrame {
             numero += OPCIONES[i].length;
         }
         return numero;
+    }
+
+    /*
+     * Colección de proyectos en memoria.
+     */
+    private static ArrayList<Proyecto> losProyectos = new ArrayList<>();
+
+    /*
+     * las demás siguen como "pendientes" hasta integrar los otros metodos.
+     */
+    private void ejecutarOpcion(int numeroOpcion, String descripcion) {
+        switch (numeroOpcion) {
+            case 13: {
+                generarArchivoDeObjetosProyectos(losProyectos);
+                break;
+            }
+            case 14: {
+                generarArchivoDeObjetosClientes(losProyectos);
+                break;
+            }
+            case 15: {
+                ArrayList<Proyecto> proyectosLeidos = leerArchivoDeObjetosProyectos();
+                // Si el archivo no existe o falla la lectura, no se pierde lo que hay en memoria.
+                if (!proyectosLeidos.isEmpty()) {
+                    losProyectos = proyectosLeidos;
+                }
+                break;
+            }
+            case 16: {
+                ArrayList<Cliente> clientesLeidos = leerArchivoDeObjetosClientes();
+                if (!clientesLeidos.isEmpty()) {
+                    String resultado = "CLIENTES LEIDOS DEL ARCHIVO\n";
+                    for (Cliente cliente : clientesLeidos) {
+                        resultado += cliente.toString() + "\n";
+                    }
+                    JOptionPane.showMessageDialog(this, resultado, "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                }
+                break;
+            }
+            default:
+                mostrarPendiente(numeroOpcion, descripcion);
+                break;
+        }
+    }
+
+    /*
+     * Gestionar archivo de objetos
+    */
+        //Generar archivo de objetos de proyectos: almacenar la colección en el archivo
+    public static void generarArchivoDeObjetosProyectos( ArrayList<Proyecto> listaPrincipal){
+        if(listaPrincipal.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Lista vacía, no se puede generar el archivo ...", "GENERACIÓN DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } else{
+            String nombreArchivo = "datosProyectos.obj";
+            ObjectOutputStream salida = null;
+            boolean exito = true;
+            try{
+                salida = new ObjectOutputStream(new FileOutputStream(nombreArchivo));
+                salida.writeObject(listaPrincipal);
+            } catch(Exception ex){
+                exito = false;
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error almacenando datos en archivo.\n "
+                                                + "Revisar serializacion de clases.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            } finally{
+                try{
+                    salida.close();
+                    if(exito){
+                        JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo generado correctamente.", "GENERACION DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } catch(Exception ex){
+                    JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+        //Leer archivo de objetos de proyectos: recuperar los datos desde el archivo
+    public static ArrayList<Proyecto> leerArchivoDeObjetosProyectos(){
+        String nombreArchivo = "datosProyectos.obj";
+        ObjectInputStream entrada = null;
+        boolean exito = true;
+        ArrayList<Proyecto> listaPrincipal = new ArrayList<>();
+        ArrayList<Proyecto> listaNueva = new ArrayList<>();
+        try{
+            entrada = new ObjectInputStream(new FileInputStream(nombreArchivo));
+            listaNueva = (ArrayList<Proyecto>) entrada.readObject();
+            listaPrincipal.addAll(listaNueva);
+        } catch(Exception ex){
+            exito = false;
+            JOptionPane.showMessageDialog(null,"Operacion fallida: error recuperado datos desde archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } finally{
+            try{
+                entrada.close();
+                if(exito){
+                    JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo leído correctamente.", "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return listaPrincipal;
+    }
+
+        //Generar archivo de objetos de clientes: almacenar el cliente de cada proyecto en el archivo
+    public static void generarArchivoDeObjetosClientes( ArrayList<Proyecto> datos){
+        if(datos.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Lista vacia, no se puede generar el archivo ...", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } else{
+            String nombreArchivo = "datosClientes.obj";
+            ObjectOutputStream salida = null;
+            boolean exito = true;
+            ArrayList<Cliente> listaPrincipal = new ArrayList<>();
+            for(Proyecto objeto : datos){
+                listaPrincipal.add(objeto.getSuCliente());
+            }
+            try{
+                salida = new ObjectOutputStream(new FileOutputStream(nombreArchivo));
+                salida.writeObject(listaPrincipal);
+            } catch(Exception ex){
+                exito = false;
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error almacenando datos en archivo.\n "
+                                                + "Revisar serialización de clases.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            } finally{
+                try{
+                    salida.close();
+                    if(exito){
+                        JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo generado correctamente.", "GENERACION DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } catch(Exception ex){
+                    JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+        //Leer archivo de objetos de clientes: recuperar los datos desde el archivo, sin repetir clientes
+    public static ArrayList<Cliente> leerArchivoDeObjetosClientes(){
+        String nombreArchivo = "datosClientes.obj";
+        ObjectInputStream entrada = null;
+        boolean exito = true;
+        ArrayList<Cliente> listaPrincipal = new ArrayList<>();
+        ArrayList<Cliente> listaNueva = new ArrayList<>();
+        try{
+            entrada = new ObjectInputStream(new FileInputStream(nombreArchivo));
+            listaNueva = (ArrayList<Cliente>) entrada.readObject();
+            for(Cliente objeto : listaNueva){
+                boolean clienteExiste = false;
+                for(Cliente existente : listaPrincipal){
+                    if(existente.getNumeroIdentificacion().equals(objeto.getNumeroIdentificacion())){
+                        clienteExiste = true;
+                    }
+                }
+                if(!clienteExiste){
+                    listaPrincipal.add(objeto);
+                }
+            }
+        } catch(Exception ex){
+            exito = false;
+            JOptionPane.showMessageDialog(null,"Operación fallida: error recuperado datos desde archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } finally{
+            try{
+                entrada.close();
+                if(exito){
+                    JOptionPane.showMessageDialog(null, "Operación exitosa, archivo leído correctamente.", "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Operación fallida: error cerrando archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return listaPrincipal;
     }
 
     private void mostrarPendiente(int numeroOpcion, String descripcion) {

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Modelo;
+import java.io.Serializable;
 import java.util.ArrayList ;
 import java.time.LocalDate;
 
@@ -11,7 +12,7 @@ import java.time.LocalDate;
  *
  * @author Gabriela imbachii
  */
-public class Proyecto {
+public class Proyecto implements Serializable {
     private String codigo ;
     private String titulo ;
     private LocalDate fechaInicio ;
