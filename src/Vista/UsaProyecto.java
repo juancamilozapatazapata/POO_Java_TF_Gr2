@@ -4,12 +4,17 @@
  */
 package Vista;
 
+import Modelo.Cliente;
+import Modelo.Proyecto;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Juan D
  */
 public class UsaProyecto extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UsaProyecto.class.getName());
 
     /**
@@ -18,7 +23,116 @@ public class UsaProyecto extends javax.swing.JFrame {
     public UsaProyecto() {
         initComponents();
     }
+    /*
+     * Definir y crear el contenedor (colección ArrayList)
+     */
+    private ArrayList<Proyecto> losProyectos = new ArrayList<>();
+    private ArrayList<Cliente> losClientes = new ArrayList<>();
 
+    /***********************************************************************************/
+       //Consultar el gerente de un proyecto dado "codigoProyecto"
+   
+    public String consultarGerenteProyectoDadoCodigo(ArrayList<Proyecto> LosProyectos, int codigoProyecto){
+        String resultado = "CONSULTA DEL GERENTE DEL PROYECTO " + codigoProyecto + "\n";
+        if(losProyectos.isEmpty()) {
+            resultado += "No hay proyectos registrados.";
+            return resultado;
+        }
+        boolean proyectoExiste = false;   
+        for(Proyecto objeto : losProyectos){
+            if(objeto.getCodigo() == codigoProyecto){ /* get de la clase proyecto*/
+                proyectoExiste = true;                
+                resultado += objeto.toString();
+                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+                resultado += "\n";
+            }
+        }
+        if(!proyectoExiste) {
+            resultado += "No hay gerente con el código indicado.";
+        }
+        return resultado;
+    }
+/*Consultar dado "numeroIDGerente" */
+
+    public String consultarProyectosDadoNumIDEGerente(ArrayList<Proyecto> LosProyectos, int numIDEGerente){
+        String resultado = "CONSULTA DE PROYECTOS DADO IDE GERENTE " + numIDEGerente + "\n";
+        if(losProyectos.isEmpty()) {
+            resultado += "No hay gerentes registrados.";
+            return resultado;
+        }    
+        boolean gerenteExiste = false;   
+        for(Proyecto objeto : losProyectos){
+            if(objeto.getSuGerente() == codigoGerente){ /* get de la clase cliente*/
+                gerenteExiste = true;                
+                resultado += objeto.toString();
+                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+                resultado += "\n";
+            }
+        }
+        if(!gerenteExiste) {
+            resultado += "No hay gerentes con el IDE indicado.";
+        }
+        return resultado;
+    }    
+    
+/*Consultar dado "numIDECliente"*/
+    public String consultarProyectosDadoNumIDECliente(ArrayList<Proyecto> LosProyectos, int numIDECliente){
+        String resultado = "CONSULTA DE PROYECTOS DADO IDE CLIENTE " + numIDECliente + "\n";
+        if(losProyectos.isEmpty()) {
+            resultado += "No hay proyectos registrados.";
+            return resultado;
+        }    
+        boolean proyectoExiste = false;   
+        for(Proyecto objeto : losProyectos){
+            if(objeto.getSuCliente() == codigoProyecto){ /* get de la clase cliente*/
+                proyectoExiste = true;                
+                resultado += objeto.toString();
+                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+                resultado += "\n";
+            }
+        }
+        if(!proyectoExiste) {
+            resultado += "No hay proyectos con el cliente indicado.";
+        }
+        return resultado;
+    }    
+    
+ /*Consultar dado "tipoCliente"*/
+ 
+
+    public String consultarProyectosDadoTipoCliente(ArrayList<Proyecto> losProyectos, String tipoCliente){
+        String resultado = "CONSULTAR LOS CLIENTES DADA CATEGORÍA " + tipoCliente + "\n";
+        if(losProyectos.isEmpty()){
+            resultado += "\n lista de proyectos vacía.";
+            return resultado;
+        } 
+        for(Proyecto objeto : losProyectos){
+            switch(tipoCliente){
+                case "EMPLEADO":
+                    if(objeto instanceof Empleado){
+                        resultado += objeto.toString();
+                        resultado += "\n  fecha de finalizacion: "   /* + fecha de finalización empleado*/; 
+                        resultado += "\n";                    
+                    }                    
+                    break;
+                case "PERSONANATURAL":
+                    if(objeto instanceof PersonaNatural){
+                        resultado += objeto.toString();
+                        resultado += "\n  fecha de finalizacion: " /* + fecha de finalización persona natural*/;
+                        resultado += "\n";                    
+                    }                     
+                    break;
+            }
+        }
+        return resultado;
+    }
+                                              
+
+   
+    
+    /***********************************************************************************/
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -33,20 +147,25 @@ public class UsaProyecto extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        jButtonRegistrar = new javax.swing.JButton();
+        jTextFieldProyecto = new javax.swing.JTextField();
+        jTextFieldIntegrante = new javax.swing.JTextField();
+        jTextFieldEquipo = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTextAreaResultados = new javax.swing.JTextArea();
         jPanel4 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        jButtonConsultarTodos = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButtonConsultaGERENTE = new javax.swing.JButton();
+        jTextFieldFiltro = new javax.swing.JTextField();
+        jButtonConsultaIDCLIENTE = new javax.swing.JButton();
+        jButtonConsultaIDGERENTE = new javax.swing.JButton();
+        jButtonConsultaTIPOCLIENTE = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -74,13 +193,7 @@ public class UsaProyecto extends javax.swing.JFrame {
 
         jLabel7.setText("Equipo");
 
-        jButton1.setText("Registrar");
-
-        jTextField1.setText("jTextField1");
-
-        jTextField2.setText("jTextField2");
-
-        jTextField3.setText("jTextField3");
+        jButtonRegistrar.setText("Registrar");
 
         javax.swing.GroupLayout bloqueLayout = new javax.swing.GroupLayout(bloque);
         bloque.setLayout(bloqueLayout);
@@ -94,17 +207,17 @@ public class UsaProyecto extends javax.swing.JFrame {
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(9, 9, 9)
                         .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
-                            .addComponent(jTextField2)))
+                            .addComponent(jTextFieldIntegrante)
+                            .addComponent(jTextFieldProyecto)))
                     .addGroup(bloqueLayout.createSequentialGroup()
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField3))
+                        .addComponent(jTextFieldEquipo, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bloqueLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(jButtonRegistrar)))
                 .addContainerGap())
         );
         bloqueLayout.setVerticalGroup(
@@ -115,17 +228,17 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldProyecto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel6)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldIntegrante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldEquipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(jButtonRegistrar)
                 .addContainerGap())
         );
 
@@ -134,15 +247,15 @@ public class UsaProyecto extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("Consultar");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTextAreaResultados.setColumns(20);
+        jTextAreaResultados.setRows(5);
+        jScrollPane1.setViewportView(jTextAreaResultados);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel10.setText("Proyecto");
 
-        jButton2.setText("Todos");
+        jButtonConsultarTodos.setText("Todos");
 
         jButton3.setText("En curso");
 
@@ -150,6 +263,20 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButton4.addActionListener(this::jButton4ActionPerformed);
 
         jButton5.setText("Ultimo");
+
+        jButtonConsultaGERENTE.setText("Gerente (código)");
+        jButtonConsultaGERENTE.addActionListener(this::jButtonConsultaGERENTEActionPerformed);
+
+        jTextFieldFiltro.setText("Filtro");
+
+        jButtonConsultaIDCLIENTE.setText("Proyectos de Cliente (ID)");
+        jButtonConsultaIDCLIENTE.addActionListener(this::jButtonConsultaIDCLIENTEActionPerformed);
+
+        jButtonConsultaIDGERENTE.setText("Proyectos de Gerente (ID)");
+        jButtonConsultaIDGERENTE.addActionListener(this::jButtonConsultaIDGERENTEActionPerformed);
+
+        jButtonConsultaTIPOCLIENTE.setText("jButton1");
+        jButtonConsultaTIPOCLIENTE.addActionListener(this::jButtonConsultaTIPOCLIENTEActionPerformed);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -161,12 +288,24 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addGap(3, 3, 3)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonConsultarTodos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonConsultaGERENTE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jButton5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButtonConsultaIDGERENTE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButtonConsultaIDCLIENTE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGap(5, 5, 5)
+                .addComponent(jButtonConsultaTIPOCLIENTE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTextFieldFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,14 +313,19 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton2)
-                        .addComponent(jButton4))
+                        .addComponent(jButtonConsultarTodos)
+                        .addComponent(jButton4)
+                        .addComponent(jButtonConsultaGERENTE, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextFieldFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonConsultaTIPOCLIENTE))
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
-                    .addComponent(jButton5))
-                .addContainerGap(30, Short.MAX_VALUE))
+                    .addComponent(jButton5)
+                    .addComponent(jButtonConsultaIDCLIENTE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addComponent(jButtonConsultaIDGERENTE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -206,8 +350,8 @@ public class UsaProyecto extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -225,13 +369,12 @@ public class UsaProyecto extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(103, 103, 103)
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(197, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(71, 71, 71)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -274,7 +417,7 @@ public class UsaProyecto extends javax.swing.JFrame {
                         .addComponent(jButton6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton8)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(331, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,7 +449,7 @@ public class UsaProyecto extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 128, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -330,6 +473,45 @@ public class UsaProyecto extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButtonConsultaGERENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaGERENTEActionPerformed
+        if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
+            JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+        } else{
+                int filtroCodigoE = Integer.parseInt(jTextFieldFiltro.getText());
+                jTextAreaResultados.setText(consultarGerenteProyectoDadoCodigo(losProyectos, filtroCodigoE));
+                jTextFieldFiltro.setText("");
+        }
+    }//GEN-LAST:event_jButtonConsultaGERENTEActionPerformed
+
+    private void jButtonConsultaIDCLIENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaIDCLIENTEActionPerformed
+        if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
+            JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+        } else{
+                int filtroIDClienteE = Integer.parseInt(jTextFieldFiltro.getText());
+                jTextAreaResultados.setText(consultarProyectosDadoNumIDECliente(losProyectos, filtroIDClienteE));
+                jTextFieldFiltro.setText("");
+        }                             
+    }//GEN-LAST:event_jButtonConsultaIDCLIENTEActionPerformed
+
+    private void jButtonConsultaIDGERENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaIDGERENTEActionPerformed
+        if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
+            JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+        } else{
+                int filtroIDGerenteE = Integer.parseInt(jTextFieldFiltro.getText());
+                jTextAreaResultados.setText(consultarProyectosDadoNumIDEGerente(losProyectos, filtroIDGerenteE));
+                jTextFieldFiltro.setText("");
+        }                                    
+    }//GEN-LAST:event_jButtonConsultaIDGERENTEActionPerformed
+
+    private void jButtonConsultaTIPOCLIENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaTIPOCLIENTEActionPerformed
+        if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isEmpty()){
+            JOptionPane.showMessageDialog(null, "¡Operación fallida!\nNo se puede realizar la consulta.\nCategoría: entrada vacía.", "GESTIÓN CLIENTES", JOptionPane.ERROR_MESSAGE);            
+        } else{
+            jTextAreaResultados.setText(consultarProyectosDadoTipoCliente(losProyectos, jTextFieldFiltro.getText().toUpperCase()));    
+            jTextFieldFiltro.setText("");
+        }       
+    }//GEN-LAST:event_jButtonConsultaTIPOCLIENTEActionPerformed
 
     /**
      * @param args the command line arguments
@@ -358,8 +540,6 @@ public class UsaProyecto extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bloque;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
@@ -367,6 +547,12 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JButton jButtonConsultaGERENTE;
+    private javax.swing.JButton jButtonConsultaIDCLIENTE;
+    private javax.swing.JButton jButtonConsultaIDGERENTE;
+    private javax.swing.JButton jButtonConsultaTIPOCLIENTE;
+    private javax.swing.JButton jButtonConsultarTodos;
+    private javax.swing.JButton jButtonRegistrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -382,9 +568,10 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextArea jTextAreaResultados;
+    private javax.swing.JTextField jTextFieldEquipo;
+    private javax.swing.JTextField jTextFieldFiltro;
+    private javax.swing.JTextField jTextFieldIntegrante;
+    private javax.swing.JTextField jTextFieldProyecto;
     // End of variables declaration//GEN-END:variables
 }
