@@ -8,6 +8,16 @@ import Modelo.Cliente;
 import Modelo.Proyecto;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import Modelo.Empresa;
+import Modelo.PersonaNatural;
+import java.awt.GraphicsConfiguration;
+import java.awt.HeadlessException;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  *
@@ -18,24 +28,39 @@ public class UsaProyecto extends javax.swing.JFrame {
     /*
      * Definir y crear el contenedor (colección ArrayList)
      */
-    private ArrayList<Proyecto> losProyectos = new ArrayList<>();
-    private ArrayList<Cliente> losClientes = new ArrayList<>();
+    private static ArrayList<Proyecto> losProyectos = new ArrayList<>();
+    private static ArrayList<Cliente> losClientes = new ArrayList<>();
+   
+    public UsaProyecto() throws HeadlessException{
+    }
+
+    public UsaProyecto(GraphicsConfiguration gc) {
+        super(gc);
+    }
+
+    public UsaProyecto(String title) throws HeadlessException {
+        super(title);
+    }
+
+    /*****************************************************/
+    /*Constructor*/
+
 
     /***********************************************************************************/
-       //Consultar el gerente de un proyecto dado "codigoProyecto"
-   
-    public String consultarGerenteProyectoDadoCodigo(ArrayList<Proyecto> LosProyectos, int codigoProyecto){
+    /*consultas*/
+//Consultar el gerente de un proyecto dado "codigoProyecto"
+    public String consultarGerenteProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
         String resultado = "CONSULTA DEL GERENTE DEL PROYECTO " + codigoProyecto + "\n";
-        if(losProyectos.isEmpty()) {
+        if(datos.isEmpty()) {
             resultado += "No hay proyectos registrados.";
             return resultado;
         }
         boolean proyectoExiste = false;   
-        for(Proyecto objeto : losProyectos){
-            if(objeto.getCodigo() == codigoProyecto){ /* get de la clase proyecto*/
+        for(Proyecto objeto : datos){
+            if(objeto.getCodigo().equalsIgnoreCase(codigoProyecto)){
                 proyectoExiste = true;                
-                resultado += objeto.toString();
-                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+                resultado += ", Proyecto=" + objeto.getTitulo();
+                resultado += ", desempeño=" + objeto.getSuGerente(); 
                 resultado += "\n";
             }
         }
@@ -46,7 +71,7 @@ public class UsaProyecto extends javax.swing.JFrame {
     }
 /*Consultar dado "numeroIDGerente" */
 
-    public String consultarProyectosDadoNumIDEGerente(ArrayList<Proyecto> LosProyectos, int numIDEGerente){
+    public String consultarProyectosDadoNumIDEGerente(ArrayList<Proyecto> LosProyectos, String numIDEGerente){
         String resultado = "CONSULTA DE PROYECTOS DADO IDE GERENTE " + numIDEGerente + "\n";
         if(losProyectos.isEmpty()) {
             resultado += "No hay gerentes registrados.";
@@ -54,10 +79,10 @@ public class UsaProyecto extends javax.swing.JFrame {
         }    
         boolean gerenteExiste = false;   
         for(Proyecto objeto : losProyectos){
-            if(objeto.getSuGerente() == codigoGerente){ /* get de la clase cliente*/
+            if(objeto.getSuGerente().getNumeroIdentificacion().equalsIgnoreCase(numIDEGerente)){ 
                 gerenteExiste = true;                
-                resultado += objeto.toString();
-                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+                resultado += "\n" + objeto.toString();
+                resultado += "\n  fecha de finalización= " + objeto.determinarFechaFinalizacion();
                 resultado += "\n";
             }
         }
@@ -68,27 +93,27 @@ public class UsaProyecto extends javax.swing.JFrame {
     }    
     
 /*Consultar dado "numIDECliente"*/
-    public String consultarProyectosDadoNumIDECliente(ArrayList<Proyecto> LosProyectos, int numIDECliente){
-        String resultado = "CONSULTA DE PROYECTOS DADO IDE CLIENTE " + numIDECliente + "\n";
+    public String consultarProyectosDadoNumIDECliente(ArrayList<Proyecto> LosProyectos, String numIDECliente){
+        String resultado = "CONSULTA DE PROYECTOS DADO IDE GERENTE " + numIDECliente + "\n";
         if(losProyectos.isEmpty()) {
-            resultado += "No hay proyectos registrados.";
+            resultado += "No hay clientes registrados.";
             return resultado;
         }    
-        boolean proyectoExiste = false;   
+        boolean clienteExiste = false;   
         for(Proyecto objeto : losProyectos){
-            if(objeto.getSuCliente() == codigoProyecto){ /* get de la clase cliente*/
-                proyectoExiste = true;                
-                resultado += objeto.toString();
-                resultado += ", desempeño=" + objeto.determinarDesempenio(); /*metodo de proyecto*/
+            if(objeto.getSuCliente().getNumeroIdentificacion().equalsIgnoreCase(numIDECliente)){ 
+                clienteExiste = true;                
+                resultado += "\n" + objeto.toString();
+                resultado += "\n  fecha de finalización= " + objeto.determinarFechaFinalizacion();
                 resultado += "\n";
             }
         }
-        if(!proyectoExiste) {
-            resultado += "No hay proyectos con el cliente indicado.";
+        if(!clienteExiste) {
+            resultado += "No hay gerentes con el IDE indicado.";
         }
         return resultado;
     }    
-    
+     
  /*Consultar dado "tipoCliente"*/
  
 
@@ -97,24 +122,32 @@ public class UsaProyecto extends javax.swing.JFrame {
         if(losProyectos.isEmpty()){
             resultado += "\n lista de proyectos vacía.";
             return resultado;
-        } 
+        }
+        boolean existe = false;
         for(Proyecto objeto : losProyectos){
             switch(tipoCliente){
-                case "EMPLEADO":
-                    if(objeto instanceof Empleado){
-                        resultado += objeto.toString();
-                        resultado += "\n  fecha de finalizacion: "   /* + fecha de finalización empleado*/; 
+                case "EMPRESA":
+                    if(objeto.getSuCliente() instanceof Empresa){
+                        existe = true;
+                        resultado += "\n" + objeto.toString();
+                        resultado += "\n  fecha de finalización= " + objeto.determinarFechaFinalizacion();
                         resultado += "\n";                    
                     }                    
                     break;
                 case "PERSONANATURAL":
-                    if(objeto instanceof PersonaNatural){
-                        resultado += objeto.toString();
-                        resultado += "\n  fecha de finalizacion: " /* + fecha de finalización persona natural*/;
-                        resultado += "\n";                    
+                    if(objeto.getSuCliente() instanceof PersonaNatural){
+                        resultado += "\n" + objeto.toString();
+                        resultado += "\n  fecha de finalización= " + objeto.determinarFechaFinalizacion();
+                        resultado += "\n";                     
                     }                     
                     break;
+                default:
+                    return resultado + "\nTipo de cliente inválido. Use Empresa o PersonaNatural.";
             }
+        }
+        if(!existe){
+            resultado += "\nNo hay proyectos con el tipo de cliente indicado.";
+            
         }
         return resultado;
     }
@@ -467,21 +500,21 @@ public class UsaProyecto extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButtonConsultaGERENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaGERENTEActionPerformed
-        if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
-            JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-        } else{
-                int filtroCodigoE = Integer.parseInt(jTextFieldFiltro.getText());
-                jTextAreaResultados.setText(consultarGerenteProyectoDadoCodigo(losProyectos, filtroCodigoE));
-                jTextFieldFiltro.setText("");
-        }
+    String filtroCodigo = jTextFieldFiltro.getText().trim();
+
+    if(filtroCodigo.isEmpty()){
+        JOptionPane.showMessageDialog(this, "Operación inválida, filtro vacío.",
+                "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+    } else{
+        jTextAreaResultados.setText(consultarGerenteProyectoDadoCodigo(losProyectos, filtroCodigo));
+    }
     }//GEN-LAST:event_jButtonConsultaGERENTEActionPerformed
 
     private void jButtonConsultaIDCLIENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaIDCLIENTEActionPerformed
         if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
             JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
         } else{
-                int filtroIDClienteE = Integer.parseInt(jTextFieldFiltro.getText());
-                jTextAreaResultados.setText(consultarProyectosDadoNumIDECliente(losProyectos, filtroIDClienteE));
+                jTextAreaResultados.setText(consultarProyectosDadoNumIDECliente(losProyectos, jTextFieldFiltro.getText()));
                 jTextFieldFiltro.setText("");
         }                             
     }//GEN-LAST:event_jButtonConsultaIDCLIENTEActionPerformed
@@ -490,8 +523,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
             JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
         } else{
-                int filtroIDGerenteE = Integer.parseInt(jTextFieldFiltro.getText());
-                jTextAreaResultados.setText(consultarProyectosDadoNumIDEGerente(losProyectos, filtroIDGerenteE));
+                jTextAreaResultados.setText(consultarProyectosDadoNumIDEGerente(losProyectos, jTextFieldFiltro.getText()));
                 jTextFieldFiltro.setText("");
         }                                    
     }//GEN-LAST:event_jButtonConsultaIDGERENTEActionPerformed
@@ -522,8 +554,9 @@ public class UsaProyecto extends javax.swing.JFrame {
                 }
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
+    java.util.logging.Logger.getLogger(UsaProyecto.class.getName())
+            .log(java.util.logging.Level.SEVERE, null, ex);
+}
         //</editor-fold>
 
         /* Create and display the form */

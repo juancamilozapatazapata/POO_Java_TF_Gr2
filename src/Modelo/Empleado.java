@@ -59,5 +59,9 @@ public class Empleado implements Serializable {
     public String toString() {
         return "Empleado{" + "numeroIdentificacion=" + numeroIdentificacion + ", nombreCompleto=" + nombreCompleto + ", tituloProfesional=" + tituloProfesional + ", aniosExperiencia=" + aniosExperiencia + '}';
     }
+
+    public boolean equalsIgnoreCase(String numIDEGerente) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }
