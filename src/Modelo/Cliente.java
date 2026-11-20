@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Juan D
+ * @author Juan D and Gabriela imbachi
  */
 public abstract class Cliente implements Serializable { 
     
