@@ -30,7 +30,13 @@ public class UsaProyecto extends javax.swing.JFrame {
      */
     private static ArrayList<Proyecto> losProyectos = new ArrayList<>();
     private static ArrayList<Cliente> losClientes = new ArrayList<>();
-   
+
+    
+    /*****************************************************/
+    /*Constructor*/
+
+    
+ /************************************/   
     public UsaProyecto() throws HeadlessException{
     }
 
@@ -42,8 +48,6 @@ public class UsaProyecto extends javax.swing.JFrame {
         super(title);
     }
 
-    /*****************************************************/
-    /*Constructor*/
 
 
     /***********************************************************************************/
@@ -203,6 +207,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("GESTIÓN DE PROYECTOS");
 
         bloque.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -292,7 +297,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButtonConsultaGERENTE.setText("Gerente (código)");
         jButtonConsultaGERENTE.addActionListener(this::jButtonConsultaGERENTEActionPerformed);
 
-        jTextFieldFiltro.setText("Filtro");
+        jTextFieldFiltro.addActionListener(this::jTextFieldFiltroActionPerformed);
 
         jButtonConsultaIDCLIENTE.setText("Proyectos de Cliente (ID)");
         jButtonConsultaIDCLIENTE.addActionListener(this::jButtonConsultaIDCLIENTEActionPerformed);
@@ -300,7 +305,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButtonConsultaIDGERENTE.setText("Proyectos de Gerente (ID)");
         jButtonConsultaIDGERENTE.addActionListener(this::jButtonConsultaIDGERENTEActionPerformed);
 
-        jButtonConsultaTIPOCLIENTE.setText("jButton1");
+        jButtonConsultaTIPOCLIENTE.setText("Tipo de Cliente");
         jButtonConsultaTIPOCLIENTE.addActionListener(this::jButtonConsultaTIPOCLIENTEActionPerformed);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -375,8 +380,8 @@ public class UsaProyecto extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -467,14 +472,14 @@ public class UsaProyecto extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(bloque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 128, Short.MAX_VALUE)))
+                        .addGap(0, 84, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -536,6 +541,10 @@ public class UsaProyecto extends javax.swing.JFrame {
             jTextFieldFiltro.setText("");
         }       
     }//GEN-LAST:event_jButtonConsultaTIPOCLIENTEActionPerformed
+
+    private void jTextFieldFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldFiltroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldFiltroActionPerformed
 
     /**
      * @param args the command line arguments
