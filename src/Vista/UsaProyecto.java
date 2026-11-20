@@ -18,6 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  *
@@ -38,6 +42,7 @@ public class UsaProyecto extends javax.swing.JFrame {
     
  /************************************/   
     public UsaProyecto() throws HeadlessException{
+        initComponents();
     }
 
     public UsaProyecto(GraphicsConfiguration gc) {
@@ -162,6 +167,132 @@ public class UsaProyecto extends javax.swing.JFrame {
     /***********************************************************************************/
     
     
+    /***********************************************************************************/
+    /*Gestionar archivo de objetos*/
+        //Generar archivo de objetos de proyectos: almacenar la coleccion en el archivo
+    public static void generarArchivoDeObjetosProyectos( ArrayList<Proyecto> listaPrincipal){
+        if(listaPrincipal.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Lista vacia, no se puede generar el archivo ...", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } else{
+            String nombreArchivo = "datosProyectos.obj";
+            ObjectOutputStream salida = null;
+            boolean exito = true;
+            try{
+                salida = new ObjectOutputStream(new FileOutputStream(nombreArchivo));
+                salida.writeObject(listaPrincipal);
+            } catch(Exception ex){
+                exito = false;
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error almacenando datos en archivo.\n "
+                                                + "Revisar serializacion de clases.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            } finally{
+                try{
+                    salida.close();
+                    if(exito){
+                        JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo generado correctamente.", "GENERACION DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } catch(Exception ex){
+                    JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+        //Leer archivo de objetos de proyectos: recuperar los datos desde el archivo
+    public static ArrayList<Proyecto> leerArchivoDeObjetosProyectos(){
+        String nombreArchivo = "datosProyectos.obj";
+        ObjectInputStream entrada = null;
+        boolean exito = true;
+        ArrayList<Proyecto> listaPrincipal = new ArrayList<>();
+        ArrayList<Proyecto> listaNueva = new ArrayList<>();
+        try{
+            entrada = new ObjectInputStream(new FileInputStream(nombreArchivo));
+            listaNueva = (ArrayList<Proyecto>) entrada.readObject();
+            listaPrincipal.addAll(listaNueva);
+        } catch(Exception ex){
+            exito = false;
+            JOptionPane.showMessageDialog(null,"Operacion fallida: error recuperado datos desde archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } finally{
+            try{
+                entrada.close();
+                if(exito){
+                    JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo leido correctamente.", "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return listaPrincipal;
+    }
+
+        //Generar archivo de objetos de clientes: almacenar el cliente de cada proyecto en el archivo
+    public static void generarArchivoDeObjetosClientes( ArrayList<Proyecto> datos){
+        if(datos.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Lista vacia, no se puede generar el archivo ...", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } else{
+            String nombreArchivo = "datosClientes.obj";
+            ObjectOutputStream salida = null;
+            boolean exito = true;
+            ArrayList<Cliente> listaPrincipal = new ArrayList<>();
+            for(Proyecto objeto : datos){
+                listaPrincipal.add(objeto.getSuCliente());
+            }
+            try{
+                salida = new ObjectOutputStream(new FileOutputStream(nombreArchivo));
+                salida.writeObject(listaPrincipal);
+            } catch(Exception ex){
+                exito = false;
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error almacenando datos en archivo.\n "
+                                                + "Revisar serializacion de clases.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            } finally{
+                try{
+                    salida.close();
+                    if(exito){
+                        JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo generado correctamente.", "GENERACION DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } catch(Exception ex){
+                    JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+        //Leer archivo de objetos de clientes: recuperar los datos desde el archivo, sin repetir clientes
+    public static ArrayList<Cliente> leerArchivoDeObjetosClientes(){
+        String nombreArchivo = "datosClientes.obj";
+        ObjectInputStream entrada = null;
+        boolean exito = true;
+        ArrayList<Cliente> listaPrincipal = new ArrayList<>();
+        ArrayList<Cliente> listaNueva = new ArrayList<>();
+        try{
+            entrada = new ObjectInputStream(new FileInputStream(nombreArchivo));
+            listaNueva = (ArrayList<Cliente>) entrada.readObject();
+            for(Cliente objeto : listaNueva){
+                boolean clienteExiste = false;
+                for(Cliente existente : listaPrincipal){
+                    if(existente.getNumeroIdentificacion().equals(objeto.getNumeroIdentificacion())){
+                        clienteExiste = true;
+                    }
+                }
+                if(!clienteExiste){
+                    listaPrincipal.add(objeto);
+                }
+            }
+        } catch(Exception ex){
+            exito = false;
+            JOptionPane.showMessageDialog(null,"Operacion fallida: error recuperado datos desde archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+        } finally{
+            try{
+                entrada.close();
+                if(exito){
+                    JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo leido correctamente.", "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return listaPrincipal;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -197,14 +328,12 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButtonConsultaTIPOCLIENTE = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
+        jButtonGenerarProyectos = new javax.swing.JButton();
+        jButtonGenerarClientes = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
+        jButtonLeerProyectos = new javax.swing.JButton();
+        jButtonLeerClientes = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("GESTIÓN DE PROYECTOS");
@@ -389,9 +518,11 @@ public class UsaProyecto extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("Generar");
 
-        jLabel8.setText("jLabel8");
+        jButtonGenerarProyectos.setText("Proyectos");
+        jButtonGenerarProyectos.addActionListener(this::jButtonGenerarProyectosActionPerformed);
 
-        jLabel9.setText("jLabel9");
+        jButtonGenerarClientes.setText("Clientes");
+        jButtonGenerarClientes.addActionListener(this::jButtonGenerarClientesActionPerformed);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -399,11 +530,12 @@ public class UsaProyecto extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(71, 71, 71)
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jButtonGenerarProyectos)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButtonGenerarClientes)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -413,9 +545,9 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9))
-                .addContainerGap(19, Short.MAX_VALUE))
+                    .addComponent(jButtonGenerarProyectos)
+                    .addComponent(jButtonGenerarClientes))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -423,13 +555,11 @@ public class UsaProyecto extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Leer");
 
-        jButton6.setText("jButton6");
+        jButtonLeerProyectos.setText("Proyectos");
+        jButtonLeerProyectos.addActionListener(this::jButtonLeerProyectosActionPerformed);
 
-        jButton7.setText("jButton7");
-
-        jButton8.setText("jButton8");
-
-        jButton9.setText("jButton9");
+        jButtonLeerClientes.setText("Clientes");
+        jButtonLeerClientes.addActionListener(this::jButtonLeerClientesActionPerformed);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -438,15 +568,11 @@ public class UsaProyecto extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton7)
+                        .addComponent(jButtonLeerProyectos)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton9))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton8)))
+                        .addComponent(jButtonLeerClientes)))
                 .addContainerGap(331, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -456,12 +582,8 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton6)
-                    .addComponent(jButton8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton7)
-                    .addComponent(jButton9))
+                    .addComponent(jButtonLeerProyectos)
+                    .addComponent(jButtonLeerClientes))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
@@ -546,6 +668,38 @@ public class UsaProyecto extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldFiltroActionPerformed
 
+    private void jButtonGenerarProyectosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGenerarProyectosActionPerformed
+        generarArchivoDeObjetosProyectos(losProyectos);
+    }//GEN-LAST:event_jButtonGenerarProyectosActionPerformed
+
+    private void jButtonGenerarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGenerarClientesActionPerformed
+        generarArchivoDeObjetosClientes(losProyectos);
+    }//GEN-LAST:event_jButtonGenerarClientesActionPerformed
+
+    private void jButtonLeerProyectosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLeerProyectosActionPerformed
+        ArrayList<Proyecto> proyectosLeidos = leerArchivoDeObjetosProyectos();
+        if(!proyectosLeidos.isEmpty()){
+            losProyectos = proyectosLeidos;
+            String resultado = "PROYECTOS LEIDOS DEL ARCHIVO\n";
+            for(Proyecto objeto : losProyectos){
+                resultado += "\n" + objeto.toString() + "\n";
+            }
+            jTextAreaResultados.setText(resultado);
+        }
+    }//GEN-LAST:event_jButtonLeerProyectosActionPerformed
+
+    private void jButtonLeerClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLeerClientesActionPerformed
+        ArrayList<Cliente> clientesLeidos = leerArchivoDeObjetosClientes();
+        if(!clientesLeidos.isEmpty()){
+            losClientes = clientesLeidos;
+            String resultado = "CLIENTES LEIDOS DEL ARCHIVO\n";
+            for(Cliente objeto : losClientes){
+                resultado += "\n" + objeto.toString() + "\n";
+            }
+            jTextAreaResultados.setText(resultado);
+        }
+    }//GEN-LAST:event_jButtonLeerClientesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -577,15 +731,15 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JButton jButtonConsultaGERENTE;
     private javax.swing.JButton jButtonConsultaIDCLIENTE;
     private javax.swing.JButton jButtonConsultaIDGERENTE;
     private javax.swing.JButton jButtonConsultaTIPOCLIENTE;
     private javax.swing.JButton jButtonConsultarTodos;
+    private javax.swing.JButton jButtonGenerarClientes;
+    private javax.swing.JButton jButtonGenerarProyectos;
+    private javax.swing.JButton jButtonLeerClientes;
+    private javax.swing.JButton jButtonLeerProyectos;
     private javax.swing.JButton jButtonRegistrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -595,8 +749,6 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
