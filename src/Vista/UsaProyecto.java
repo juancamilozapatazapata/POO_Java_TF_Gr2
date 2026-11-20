@@ -14,15 +14,7 @@ import javax.swing.JOptionPane;
  * @author Juan D
  */
 public class UsaProyecto extends javax.swing.JFrame {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UsaProyecto.class.getName());
-
-    /**
-     * Creates new form UsaProyecto
-     */
-    public UsaProyecto() {
-        initComponents();
-    }
+    
     /*
      * Definir y crear el contenedor (colección ArrayList)
      */
