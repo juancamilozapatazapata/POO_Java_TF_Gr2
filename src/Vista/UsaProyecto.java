@@ -32,10 +32,14 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.Cliente;
 import Modelo.Proyecto;
+import Modelo.Empleado;
+import java.awt.HeadlessException;
+import java.io.IOException;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 /**
  *
- * @author Juan Camilo Zapata
+ * @author Juan Camilo Zapata y Dylan Riascos
  * @version 1 - 16 nov. 2026
  */
 /**
@@ -224,6 +228,57 @@ public class UsaProyecto extends JFrame {
      */
     private void ejecutarOpcion(int numeroOpcion, String descripcion) {
         switch (numeroOpcion) {
+            case 7: {
+                String codigo = JOptionPane.showInputDialog(
+                        this, "Ingrese el codigo del proyecto:");
+
+                if (codigo != null) {
+                    String resultado = consultarEquipoProyectoDadoCodigo(
+                        losProyectos, codigo);
+
+                    JOptionPane.showMessageDialog(this, resultado);
+                }
+                break;
+            }
+
+            case 10: {
+                String codigo = JOptionPane.showInputDialog(
+                        this, "Ingrese el codigo del proyecto:");
+
+                if (codigo != null) {
+                    String resultado = registrarIntegranteProyectoDadoCodigo(
+                            losProyectos, codigo);
+
+                    JOptionPane.showMessageDialog(this, resultado);
+                }
+                break;
+            }
+
+            case 11: {
+                String codigo = JOptionPane.showInputDialog(
+                        this, "Ingrese el codigo del proyecto:");
+
+                if (codigo != null) {
+                    String resultado = registrarEquipoProyectoDadoCodigo(
+                            losProyectos, codigo);
+
+                    JOptionPane.showMessageDialog(this, resultado);
+                }
+                break;
+            }
+
+            case 12: {
+                String codigo = JOptionPane.showInputDialog(
+                        this, "Ingrese el codigo del proyecto:");
+
+                if (codigo != null) {
+                    String resultado = eliminarIntegranteProyectoDadoCodigo(
+                            losProyectos, codigo);
+
+                    JOptionPane.showMessageDialog(this, resultado);
+                }
+                break;
+            }
             case 13: {
                 generarArchivoDeObjetosProyectos(losProyectos);
                 break;
@@ -271,17 +326,20 @@ public class UsaProyecto extends JFrame {
             try{
                 salida = new ObjectOutputStream(new FileOutputStream(nombreArchivo));
                 salida.writeObject(listaPrincipal);
-            } catch(Exception ex){
+            } catch(IOException ex){
                 exito = false;
-                JOptionPane.showMessageDialog(null,"Operacion fallida: error almacenando datos en archivo.\n "
-                                                + "Revisar serializacion de clases.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, """
+                                                    Operacion fallida: error almacenando datos en archivo.
+                                                     Revisar serializacion de clases.""", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
             } finally{
                 try{
-                    salida.close();
+                    if (salida != null) {
+                        salida.close();
+                        }
                     if(exito){
                         JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo generado correctamente.", "GENERACION DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
                     }
-                } catch(Exception ex){
+                } catch(HeadlessException | IOException ex){
                     JOptionPane.showMessageDialog(null,"Operacion fallida: error cerrando archivo.", "GENERACION DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -304,7 +362,9 @@ public class UsaProyecto extends JFrame {
             JOptionPane.showMessageDialog(null,"Operacion fallida: error recuperado datos desde archivo.", "LECTURA DE ARCHIVO", JOptionPane.ERROR_MESSAGE);
         } finally{
             try{
-                entrada.close();
+                if (entrada != null) {
+                    entrada.close();
+                    }
                 if(exito){
                     JOptionPane.showMessageDialog(null, "Operacion exitosa, archivo leído correctamente.", "LECTURA DE ARCHIVO", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -402,7 +462,7 @@ public class UsaProyecto extends JFrame {
 
         SwingUtilities.invokeLater(() -> new UsaProyecto().setVisible(true));
     }
-    =========================================================================
+    //=========================================================================
     // MÉTODOS DEL PUNTO 3: EMPLEADO Y OPERACIONES DEL EQUIPO DE CADA PROYECTO
     // =========================================================================
      // @autor: Gabriela Imbachi
@@ -736,10 +796,10 @@ public class UsaProyecto extends JFrame {
         byte aniosExp;
         try {
             aniosExp = Byte.parseByte(expStr.trim());
-            if (aniosExp < 0) {
-                JOptionPane.showMessageDialog(this, "Validación: Los años de experiencia no pueden ser negativos.");
-                return null;
-            }
+            if (aniosExp < 0 || aniosExp > 60) {
+                JOptionPane.showMessageDialog(this, "Los años de experiencia deben estar entre 0 y 60.");
+            return null;
+}
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Validación: Los años de experiencia deben ser un número entero válido (tipo byte).");
             return null;
@@ -750,10 +810,5 @@ public class UsaProyecto extends JFrame {
 
     // ==================== MAIN ====================
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            UsaProyecto ventana = new UsaProyecto();
-            ventana.setVisible(true);
-        });
     }
-}
+

@@ -2,49 +2,108 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Modelo;
-import java.io.Serializable;
-import java.util.ArrayList ;
-import java.time.LocalDate;
 
+package Modelo;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 /**
+ * Clase Proyecto.
  *
- * @author Gabriela imbachii
+ * Representa un proyecto de la empresa y permite administrar
+ * su informacion, cliente, gerente, equipo de trabajo,
+ * duracion estimada y estado.
+ *
+ * @author Gabriela Imbachi y Dylan Riascos
  */
 public class Proyecto implements Serializable {
-    private String codigo ;
-    private String titulo ;
-    private LocalDate fechaInicio ;
-    private String unidadDuracion ;
-    private byte duracionEstimada ;
-    private Cliente suCliente ;
-    private Empleado suGerente ;
-    private ArrayList<Empleado> suEquipo ;
-    private String Estado ;
 
-    public Proyecto(String codigo, String titulo, LocalDate fechaInicio, String unidadDuracion, byte duracionEstimada, Cliente suCliente, Empleado suGerente, ArrayList<Empleado> suEquipo, String Estado) {
-        this.codigo = codigo;
-        this.titulo = titulo;
-        this.fechaInicio = fechaInicio;
-        this.unidadDuracion = unidadDuracion;
-        this.duracionEstimada = duracionEstimada;
-        this.suCliente = suCliente;
-        this.suGerente = suGerente;
-        this.suEquipo = suEquipo;
-        this.Estado = Estado;
+    private static final long serialVersionUID = 1L;
+
+    // Atributos del proyecto
+    private String codigo;
+    private String titulo;
+    private LocalDate fechaInicio;
+    private String unidadDuracion;
+    private byte duracionEstimada;
+    private Cliente suCliente;
+    private Empleado suGerente;
+    private ArrayList<Empleado> suEquipo;
+    private String estado;
+
+    /**
+     * Constructor principal.
+     * Permite crear un proyecto con equipo y estado.
+     */
+    public Proyecto(String codigo, String titulo,
+            LocalDate fechaInicio, String unidadDuracion,
+            byte duracionEstimada, Cliente suCliente,
+            Empleado suGerente, ArrayList<Empleado> suEquipo,
+            String estado) {
+
+        setCodigo(codigo);
+        setTitulo(titulo);
+        setFechaInicio(fechaInicio);
+        setUnidadDuracion(unidadDuracion);
+        setDuracionEstimada(duracionEstimada);
+        setSuCliente(suCliente);
+        setSuGerente(suGerente);
+
+        this.suEquipo = new ArrayList<>();
+        if (suEquipo != null) {
+            for (Empleado empleado : suEquipo) {
+                agregarIntegrante(empleado);
+            }
+        }
+
+        setEstado(estado);
     }
 
-    public Proyecto(String codigo, String titulo, LocalDate fechaInicio, String unidadDuracion, byte duracionEstimada, Cliente suCliente, Empleado suGerente, String Estado) {
-        this.codigo = codigo;
-        this.titulo = titulo;
-        this.fechaInicio = fechaInicio;
-        this.unidadDuracion = unidadDuracion;
-        this.duracionEstimada = duracionEstimada;
-        this.suCliente = suCliente;
-        this.suGerente = suGerente;
-        this.Estado = Estado;
+    /**
+     * Constructor sin equipo.
+     * Inicializa una lista vacia de empleados.
+     */
+    public Proyecto(String codigo, String titulo,
+            LocalDate fechaInicio, String unidadDuracion,
+            byte duracionEstimada, Cliente suCliente,
+            Empleado suGerente, String estado) {
+
+        this(codigo, titulo, fechaInicio, unidadDuracion,
+                duracionEstimada, suCliente, suGerente,
+                new ArrayList<>(), estado);
     }
+
+    /**
+     * Constructor sin equipo ni estado.
+     * El estado inicial sera INICIADO.
+     */
+    public Proyecto(String codigo, String titulo,
+            LocalDate fechaInicio, String unidadDuracion,
+            byte duracionEstimada, Cliente suCliente,
+            Empleado suGerente) {
+
+        this(codigo, titulo, fechaInicio, unidadDuracion,
+                duracionEstimada, suCliente, suGerente,
+                new ArrayList<>(), "INICIADO");
+    }
+
+    /**
+     * Constructor con equipo y estado inicial automatico.
+     * Conserva compatibilidad con el codigo anterior.
+     */
+    public Proyecto(String codigo, String titulo,
+            LocalDate fechaInicio, String unidadDuracion,
+            byte duracionEstimada, Cliente suCliente,
+            Empleado suGerente, ArrayList<Empleado> suEquipo) {
+
+        this(codigo, titulo, fechaInicio, unidadDuracion,
+                duracionEstimada, suCliente, suGerente,
+                suEquipo, "INICIADO");
+    }
+
+    // GETTERS: permiten consultar los atributos.
 
     public String getCodigo() {
         return codigo;
@@ -74,97 +133,308 @@ public class Proyecto implements Serializable {
         return suGerente;
     }
 
+    /**
+     * Devuelve una copia de la lista de empleados.
+     * Evita modificaciones directas desde otras clases.
+     */
     public ArrayList<Empleado> getSuEquipo() {
-        return suEquipo;
+        return new ArrayList<>(suEquipo);
     }
 
     public String getEstado() {
-        return Estado;
+        return estado;
     }
 
-    public void setCodigo(String codigo) {
+    // SETTERS: modifican y validan los atributos.
+
+    /**
+     * Valida el codigo con formato AAAA-NNN.
+     * Ejemplo: 2026-001.
+     * @param codigo
+     */
+    public final void setCodigo(String codigo) {
+
+        if (codigo == null ||
+                !codigo.matches("\\d{4}-\\d{3}")) {
+
+            throw new IllegalArgumentException(
+                    "Codigo invalido. Ejemplo: 2026-001");
+        }
+
         this.codigo = codigo;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    /**
+     * El titulo debe tener entre 20 y 100 caracteres.
+     * @param titulo
+     */
+    public final void setTitulo(String titulo) {
+
+        if (titulo == null ||
+                titulo.trim().length() < 20 ||
+                titulo.trim().length() > 100) {
+
+            throw new IllegalArgumentException(
+                    "El titulo debe tener entre 20 y 100 caracteres");
+        }
+
+        this.titulo = titulo.trim();
     }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
+    /**
+     * La fecha de inicio es obligatoria.
+     */
+    public final void setFechaInicio(LocalDate fechaInicio) {
+
+        if (fechaInicio == null) {
+            throw new IllegalArgumentException(
+                    "La fecha de inicio es obligatoria");
+        }
+
         this.fechaInicio = fechaInicio;
     }
 
-    public void setUnidadDuracion(String unidadDuracion) {
-        this.unidadDuracion = unidadDuracion;
+    /**
+     * Valida la unidad y comprueba que la duracion
+     * existente siga siendo valida al cambiarla.
+     */
+    public final void setUnidadDuracion(String unidadDuracion) {
+
+        if (unidadDuracion == null) {
+            throw new IllegalArgumentException(
+                    "La unidad de duracion es obligatoria");
+        }
+
+        String unidad = unidadDuracion.trim().toLowerCase();
+
+        if (!unidad.equals("semanas") &&
+                !unidad.equals("meses") &&
+                !unidad.equals("años")) {
+
+            throw new IllegalArgumentException(
+                    "La unidad debe ser semanas, meses o años");
+        }
+
+        if (this.unidadDuracion != null &&
+                !duracionValida(unidad, this.duracionEstimada)) {
+
+            throw new IllegalArgumentException(
+                    "La duracion actual no es valida para " + unidad);
+        }
+
+        this.unidadDuracion = unidad;
     }
 
-    public void setDuracionEstimada(byte duracionEstimada) {
+    /**
+     * Comprueba las restricciones de duracion.
+     *
+     * Semanas: 1 a 3.
+     * Meses: 1 a 35, excepto 12 y 24.
+     * Años: 1 a 3.
+     */
+    private boolean duracionValida(String unidad, byte duracion) {
+
+        if (unidad == null) {
+            return false;
+        }
+
+        switch (unidad) {
+
+            case "semanas":
+                return duracion >= 1 && duracion <= 3;
+
+            case "meses":
+                return duracion >= 1 && duracion <= 35
+                        && duracion != 12 && duracion != 24;
+
+            case "años":
+                return duracion >= 1 && duracion <= 3;
+
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Asigna la duracion estimada del proyecto.
+     */
+    public final void setDuracionEstimada(byte duracionEstimada) {
+
+        if (!duracionValida(unidadDuracion, duracionEstimada)) {
+
+            throw new IllegalArgumentException(
+                    "Duracion no permitida para " + unidadDuracion);
+        }
+
         this.duracionEstimada = duracionEstimada;
     }
 
-    public void setSuCliente(Cliente suCliente) {
+    public final void setSuCliente(Cliente suCliente) {
         this.suCliente = suCliente;
     }
 
-    public void setSuGerente(Empleado suGerente) {
+    public final void setSuGerente(Empleado suGerente) {
         this.suGerente = suGerente;
     }
 
-    public void setSuEquipo(ArrayList<Empleado> suEquipo) {
-        this.suEquipo = suEquipo;
-    }
+    /**
+     * Reemplaza el equipo por una lista nueva.
+     * Valida los integrantes y evita identificaciones repetidas.
+     */
+    public final void setSuEquipo(ArrayList<Empleado> suEquipo) {
 
-    public void setEstado(String Estado) {
-        this.Estado = Estado;
-    }
+        ArrayList<Empleado> equipoAnterior = this.suEquipo;
+        this.suEquipo = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "Proyecto{" + "codigo=" + codigo + ", titulo=" + titulo + ", fechaInicio=" + fechaInicio + ", unidadDuracion=" + unidadDuracion + ", duracionEstimada=" + duracionEstimada + ", suCliente=" + suCliente + ", suGerente=" + suGerente + ", suEquipo=" + suEquipo + ", Estado=" + Estado + '}';
-    }
-
-    
-    
-    public LocalDate determinarFechaFinalizacion () {
-        if (fechaInicio == null || unidadDuracion == null ){ 
-            return null ;
-            
-        }
-            switch(unidadDuracion.toLowerCase()) {
-                case "semanas" :
-                    return fechaInicio.plusWeeks(duracionEstimada) ;
-                case "meses" :
-                    return fechaInicio.plusMonths(duracionEstimada) ;
-                case "años" :
-                    return fechaInicio.plusYears(duracionEstimada);
-                default:
-                    return fechaInicio;
-                            
-            }
-            
-        }
-    public void agregarIntegrante (Empleado nuevoIntegrante) {
-            if (this.suEquipo == null) {
-                this.suEquipo = new ArrayList<>();
+        try {
+            if (suEquipo != null) {
+                for (Empleado empleado : suEquipo) {
+                    agregarIntegrante(empleado);
                 }
-            if (nuevoIntegrante != null) {
-                this.suEquipo.add(nuevoIntegrante); 
             }
+        } catch (IllegalArgumentException ex) {
+            this.suEquipo = equipoAnterior;
+            throw ex;
+        }
     }
-    
+
+    /**
+     * Valida los estados permitidos del proyecto.
+     */
+    public final void setEstado(String estado) {
+
+        if (estado == null) {
+            throw new IllegalArgumentException(
+                    "El estado es obligatorio");
+        }
+
+        String nuevoEstado = estado.trim().toUpperCase();
+
+        switch (nuevoEstado) {
+
+            case "INICIADO":
+            case "EN CURSO":
+            case "CANCELADO":
+            case "FINALIZADO":
+            case "SUSPENDIDO":
+            case "APLAZADO":
+                this.estado = nuevoEstado;
+                break;
+
+            default:
+                throw new IllegalArgumentException(
+                        "Estado de proyecto no valido");
+        }
+    }
+
+    // METODOS ESPECIALES DEL PROYECTO
+
+    /**
+     * Determina la fecha de finalizacion sumando
+     * la duracion estimada a la fecha de inicio.
+     *
+     * @return Fecha estimada de finalizacion.
+     */
+    public LocalDate determinarFechaFinalizacion() {
+
+        if (fechaInicio == null || unidadDuracion == null) {
+            throw new IllegalStateException(
+                    "Faltan datos para calcular la fecha final");
+        }
+
+        switch (unidadDuracion) {
+
+            case "semanas":
+                return fechaInicio.plusWeeks(duracionEstimada);
+
+            case "meses":
+                return fechaInicio.plusMonths(duracionEstimada);
+
+            case "años":
+                return fechaInicio.plusYears(duracionEstimada);
+
+            default:
+                throw new IllegalStateException(
+                        "Unidad de duracion no valida");
+        }
+    }
+
+    /**
+     * Agrega un empleado al equipo del proyecto.
+     * No permite empleados nulos ni identificaciones duplicadas.
+     */
+    public void agregarIntegrante(Empleado nuevoIntegrante) {
+
+        if (nuevoIntegrante == null) {
+            throw new IllegalArgumentException(
+                    "El integrante no puede ser nulo");
+        }
+
+        if (nuevoIntegrante.getNumeroIdentificacion() == null) {
+            throw new IllegalArgumentException(
+                    "El integrante debe tener identificacion");
+        }
+
+        if (suEquipo == null) {
+            suEquipo = new ArrayList<>();
+        }
+
+        for (Empleado integrante : suEquipo) {
+
+            if (integrante.getNumeroIdentificacion()
+                    .equalsIgnoreCase(
+                            nuevoIntegrante.getNumeroIdentificacion())) {
+
+                throw new IllegalArgumentException(
+                        "El integrante ya pertenece al proyecto");
+            }
+        }
+
+        suEquipo.add(nuevoIntegrante);
+    }
+
+    /**
+     * Busca y elimina un empleado por su identificacion.
+     *
+     * @param numeroIdentificacion Identificacion del empleado.
+     * @return Empleado eliminado o null si no existe.
+     */
     public Empleado eliminarIntegrante(String numeroIdentificacion) {
-        if (this.suEquipo == null || numeroIdentificacion == null){
+
+        if (numeroIdentificacion == null || suEquipo == null) {
             return null;
         }
-        for (int i = 0; i < this.suEquipo.size(); i++) {
-            Empleado integrante = this.suEquipo.get(i);
-            if (integrante.getNumeroIdentificacion().equalsIgnoreCase(numeroIdentificacion.trim())) {
-                return this.suEquipo.remove(i);
-                
+
+        for (int i = 0; i < suEquipo.size(); i++) {
+
+            Empleado integrante = suEquipo.get(i);
+
+            if (integrante.getNumeroIdentificacion()
+                    .equalsIgnoreCase(numeroIdentificacion.trim())) {
+
+                return suEquipo.remove(i);
             }
         }
+
         return null;
     }
-    
+
+    /**
+     * Devuelve la informacion del proyecto en formato legible.
+     */
+    @Override
+    public String toString() {
+
+        return "Codigo: " + codigo
+                + "\nTitulo: " + titulo
+                + "\nFecha de inicio: " + fechaInicio
+                + "\nUnidad de duracion: " + unidadDuracion
+                + "\nDuracion estimada: " + duracionEstimada
+                + "\nFecha de finalizacion: "
+                + determinarFechaFinalizacion()
+                + "\nCliente: " + suCliente
+                + "\nGerente: " + suGerente
+                + "\nIntegrantes del equipo: " + suEquipo.size()
+                + "\nEstado: " + estado;
+    }
 }
-  
