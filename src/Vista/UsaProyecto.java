@@ -32,6 +32,8 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.Cliente;
 import Modelo.Proyecto;
+import Modelo.Empleado;
+
 
 /**
  *
@@ -402,7 +404,7 @@ public class UsaProyecto extends JFrame {
 
         SwingUtilities.invokeLater(() -> new UsaProyecto().setVisible(true));
     }
-    =========================================================================
+    //=========================================================================
     // MÉTODOS DEL PUNTO 3: EMPLEADO Y OPERACIONES DEL EQUIPO DE CADA PROYECTO
     // =========================================================================
      // @autor: Gabriela Imbachi
@@ -746,14 +748,5 @@ public class UsaProyecto extends JFrame {
         }
 
         return new Empleado(id, nombre.trim(), titulo.trim(), aniosExp);
-    }
-
-    // ==================== MAIN ====================
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            UsaProyecto ventana = new UsaProyecto();
-            ventana.setVisible(true);
-        });
     }
 }
