@@ -402,4 +402,358 @@ public class UsaProyecto extends JFrame {
 
         SwingUtilities.invokeLater(() -> new UsaProyecto().setVisible(true));
     }
+    =========================================================================
+    // MÉTODOS DEL PUNTO 3: EMPLEADO Y OPERACIONES DEL EQUIPO DE CADA PROYECTO
+    // =========================================================================
+     // @autor: Gabriela Imbachi
+    /**
+     * Opción 10 del menú:
+     * Realiza el registro de un integrante en el equipo del proyecto indicado por su código.
+     * Valida lista de proyectos llena, existencia del proyecto, e identificación válida/no duplicada.
+     *
+     * @param datos          Lista de proyectos registrados
+     * @param codigoProyecto Código del proyecto al que se agregará el integrante
+     * @return Mensaje con el resultado de la operación
+     */
+    public String registrarIntegranteProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        // 1. Verificar si la lista de proyectos está llena
+        if (datos == null || datos.isEmpty()) {
+            return "No hay proyectos registrados en el sistema (la lista de proyectos está vacía).";
+        }
+
+        if (codigoProyecto == null || codigoProyecto.trim().isEmpty()) {
+            return "Error: Debe proporcionar un código de proyecto válido.";
+        }
+
+        // 2. Recorrer la lista de proyectos y buscar el proyecto que cumpla la condición
+        Proyecto proyectoEncontrado = buscarProyectoPorCodigo(datos, codigoProyecto.trim());
+        if (proyectoEncontrado == null) {
+            return "No existe un proyecto registrado con el código: " + codigoProyecto;
+        }
+
+        // 3. Solicitar y validar los datos del integrante (Empleado)
+        Empleado nuevoIntegrante = solicitarDatosEmpleadoInteractivo(proyectoEncontrado.getSuEquipo());
+        if (nuevoIntegrante == null) {
+            return "Operación cancelada o datos del integrante inválidos.";
+        }
+
+        // 4. Agregar el integrante al equipo del proyecto y finalizar
+        proyectoEncontrado.agregarIntegrante(nuevoIntegrante);
+        return "Integrante registrado exitosamente en el proyecto [" + proyectoEncontrado.getCodigo() + " - "
+                + proyectoEncontrado.getTitulo() + "]:\n" + nuevoIntegrante.toString();
+    }
+
+    /**
+     * Opción 11 del menú:
+     * Realiza el registro completo de los integrantes del equipo del proyecto indicado.
+     *
+     * @param datos          Lista de proyectos registrados
+     * @param codigoProyecto Código del proyecto al que se registrará el equipo
+     * @return Mensaje con el resultado de la operación
+     */
+    public String registrarEquipoProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        // 1. Verificar si la lista está llena
+        if (datos == null || datos.isEmpty()) {
+            return "No hay proyectos registrados en el sistema (la lista de proyectos está vacía).";
+        }
+
+        if (codigoProyecto == null || codigoProyecto.trim().isEmpty()) {
+            return "Error: Debe proporcionar un código de proyecto válido.";
+        }
+
+        // 2. Recorrer la lista de proyectos y buscar el proyecto que cumpla la condición
+        for (Proyecto proyecto : datos) {
+            if (proyecto.getCodigo().equalsIgnoreCase(codigoProyecto.trim())) {
+                // Solicitar la cantidad de integrantes a registrar
+                String cantStr = JOptionPane.showInputDialog(
+                        this,
+                        "Proyecto encontrado: " + proyecto.getTitulo()
+                        + "\nIngrese la cantidad inicial de integrantes a registrar:",
+                        "Registrar Equipo",
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (cantStr == null || cantStr.trim().isEmpty()) {
+                    return "Registro de equipo cancelado.";
+                }
+
+                int cantidad;
+                try {
+                    cantidad = Integer.parseInt(cantStr.trim());
+                    if (cantidad <= 0) {
+                        return "Error: La cantidad de integrantes debe ser mayor a cero.";
+                    }
+                } catch (NumberFormatException ex) {
+                    return "Error: La cantidad ingresada no es un número entero válido.";
+                }
+
+                // Crear la lista de integrantes (equipo)
+                ArrayList<Empleado> nuevoEquipo = new ArrayList<>();
+
+                // Ciclo para llenar la lista de integrantes (equipo)
+                int contador = 1;
+                boolean continuar = true;
+                while (continuar) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Ingresando datos del integrante #" + contador,
+                            "Registro de Equipo - Proyecto " + proyecto.getCodigo(),
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                    Empleado integrante = solicitarDatosEmpleadoInteractivo(nuevoEquipo);
+                    if (integrante != null) {
+                        nuevoEquipo.add(integrante);
+                        contador++;
+                    } else {
+                        int cancelarTodo = JOptionPane.showConfirmDialog(
+                                this,
+                                "No se completó el registro de este integrante. ¿Desea cancelar todo el registro del equipo?",
+                                "Confirmar cancelación",
+                                JOptionPane.YES_NO_OPTION
+                        );
+                        if (cancelarTodo == JOptionPane.YES_OPTION) {
+                            return "Registro del equipo cancelado por el usuario.";
+                        }
+                    }
+
+                    // Evaluar si ya completó la cantidad solicitada y si requiere otro integrante
+                    if (nuevoEquipo.size() >= cantidad) {
+                        int opcionOtro = JOptionPane.showConfirmDialog(
+                                this,
+                                "¿Desea registrar otro integrante adicional en el equipo?",
+                                "Continuar registro de equipo",
+                                JOptionPane.YES_NO_OPTION
+                        );
+                        continuar = (opcionOtro == JOptionPane.YES_OPTION);
+                    }
+                }
+
+                // Actualizar el equipo del proyecto indicado y finalizar el recorrido
+                proyecto.setSuEquipo(nuevoEquipo);
+                return "Equipo registrado exitosamente para el proyecto [" + proyecto.getCodigo() + " - "
+                        + proyecto.getTitulo() + "].\nTotal de integrantes registrados: " + nuevoEquipo.size()
+                        + "\n\n" + consultarEquipoProyectoDadoCodigo(datos, codigoProyecto);
+            }
+        }
+
+        return "No existe un proyecto registrado con el código: " + codigoProyecto;
+    }
+
+    /**
+     * Opción 7 del menú:
+     * Devuelve la información del equipo de un proyecto dado su código.
+     * Conforma una cadena con el título del proyecto y toda la información de cada uno de los integrantes.
+     *
+     * @param datos          Lista de proyectos registrados
+     * @param codigoProyecto Código del proyecto a consultar
+     * @return Cadena con el título del proyecto y los datos de su equipo, o mensaje de validación
+     */
+    public String consultarEquipoProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        // 1. Verificar si la lista está llena
+        if (datos == null || datos.isEmpty()) {
+            return "No hay proyectos registrados en el sistema (la lista de proyectos está vacía).";
+        }
+
+        if (codigoProyecto == null || codigoProyecto.trim().isEmpty()) {
+            return "Error: Debe indicar un código de proyecto válido.";
+        }
+
+        // 2. Recorrer la lista de proyectos y buscar el proyecto que cumpla la condición
+        for (Proyecto proyecto : datos) {
+            if (proyecto.getCodigo().equalsIgnoreCase(codigoProyecto.trim())) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("========================================================\n");
+                sb.append("PROYECTO: ").append(proyecto.getCodigo()).append(" - ").append(proyecto.getTitulo()).append("\n");
+                sb.append("========================================================\n");
+
+                ArrayList<Empleado> equipo = proyecto.getSuEquipo();
+                if (equipo == null || equipo.isEmpty()) {
+                    sb.append("El proyecto aún no tiene integrantes registrados en su equipo.\n");
+                } else {
+                    sb.append("INTEGRANTES DEL EQUIPO (").append(equipo.size()).append("):\n");
+                    for (int i = 0; i < equipo.size(); i++) {
+                        sb.append(i + 1).append(". ").append(equipo.get(i).toString()).append("\n");
+                    }
+                }
+                return sb.toString();
+            }
+        }
+
+        return "No se encontró ningún proyecto con el código: " + codigoProyecto;
+    }
+
+    /**
+     * Opción 12 del menú:
+     * Realiza la eliminación de un integrante del equipo del proyecto indicado.
+     * Valida que la lista no esté vacía, que el proyecto exista, que la identificación sea válida
+     * y que el integrante pertenezca al equipo antes de eliminarlo.
+     *
+     * @param datos          Lista de proyectos registrados
+     * @param codigoProyecto Código del proyecto del cual se retirará el integrante
+     * @return Cadena indicando el resultado de la eliminación
+     */
+    public String eliminarIntegranteProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        // 1. Verificar si la lista de proyectos está llena
+        if (datos == null || datos.isEmpty()) {
+            return "No hay proyectos registrados en el sistema (la lista de proyectos está vacía).";
+        }
+
+        if (codigoProyecto == null || codigoProyecto.trim().isEmpty()) {
+            return "Error: Debe proporcionar un código de proyecto válido.";
+        }
+
+        // 2. Buscar el proyecto y validar su existencia
+        Proyecto proyectoEncontrado = buscarProyectoPorCodigo(datos, codigoProyecto.trim());
+        if (proyectoEncontrado == null) {
+            return "No existe un proyecto registrado con el código: " + codigoProyecto;
+        }
+
+        if (proyectoEncontrado.getSuEquipo() == null || proyectoEncontrado.getSuEquipo().isEmpty()) {
+            return "El proyecto [" + proyectoEncontrado.getCodigo() + "] no tiene integrantes en su equipo para eliminar.";
+        }
+
+        // 3. Solicitar el número de identificación del integrante (empleado)
+        String numId = JOptionPane.showInputDialog(
+                this,
+                "Ingrese el número de identificación del integrante a eliminar del proyecto "
+                + proyectoEncontrado.getCodigo() + ":",
+                "Eliminar Integrante del Equipo",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        return eliminarIntegrantePorId(datos, codigoProyecto, numId);
+    }
+
+    /**
+     * Método sobrecargado auxiliar que permite eliminar un integrante pasando el ID por parámetro
+     * (facilita tanto la invocación desde GUI como las pruebas unitarias automatizadas).
+     */
+    public String eliminarIntegrantePorId(ArrayList<Proyecto> datos, String codigoProyecto, String numIdIntegrante) {
+        if (datos == null || datos.isEmpty()) {
+            return "No hay proyectos registrados en el sistema (la lista de proyectos está vacía).";
+        }
+        if (codigoProyecto == null || codigoProyecto.trim().isEmpty()) {
+            return "Error: El código del proyecto es inválido.";
+        }
+        if (numIdIntegrante == null || numIdIntegrante.trim().isEmpty()) {
+            return "Error: El número de identificación del integrante no puede estar vacío.";
+        }
+
+        for (Proyecto proyecto : datos) {
+            if (proyecto.getCodigo().equalsIgnoreCase(codigoProyecto.trim())) {
+                if (proyecto.getSuEquipo() == null || proyecto.getSuEquipo().isEmpty()) {
+                    return "El proyecto [" + proyecto.getCodigo() + "] no tiene integrantes registrados en su equipo.";
+                }
+
+                // Verificar que el integrante pertenezca al equipo y eliminarlo
+                Empleado eliminado = proyecto.eliminarIntegrante(numIdIntegrante.trim());
+                if (eliminado != null) {
+                    return "Integrante eliminado exitosamente del proyecto [" + proyecto.getCodigo() + "]:\n"
+                            + eliminado.toString();
+                } else {
+                    return "Validación fallida: El empleado con identificación '" + numIdIntegrante.trim()
+                            + "' NO pertenece al equipo del proyecto [" + proyecto.getCodigo() + "].";
+                }
+            }
+        }
+
+        return "No existe un proyecto registrado con el código: " + codigoProyecto;
+    }
+
+    /**
+     * Alias compatible con la nota descriptiva del diagrama ("retirarIntegranteProyectoDadoCodigo").
+     */
+    public void retirarIntegranteProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        String resultado = eliminarIntegranteProyectoDadoCodigo(datos, codigoProyecto);
+        JOptionPane.showMessageDialog(this, resultado);
+    }
+
+    // ==================== MÉTODOS AUXILIARES Y DE VALIDACIÓN (PUNTO 3) ====================
+
+    private Proyecto buscarProyectoPorCodigo(ArrayList<Proyecto> datos, String codigoProyecto) {
+        for (Proyecto p : datos) {
+            if (p.getCodigo().equalsIgnoreCase(codigoProyecto)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Verifica si ya existe un integrante con el mismo número de identificación dentro de un equipo.
+     */
+    public boolean existeIntegranteEnEquipo(ArrayList<Empleado> equipo, String numeroIdentificacion) {
+        if (equipo == null || numeroIdentificacion == null) {
+            return false;
+        }
+        for (Empleado emp : equipo) {
+            if (emp.getNumeroIdentificacion().equalsIgnoreCase(numeroIdentificacion.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Solicita por cuadros de diálogo los datos de un Empleado validando:
+     * - Identificación no vacía y no repetida en el equipo
+     * - Nombre completo no vacío
+     * - Título profesional no vacío
+     * - Años de experiencia numéricos válidos (byte >= 0)
+     */
+    private Empleado solicitarDatosEmpleadoInteractivo(ArrayList<Empleado> equipoActual) {
+        String id = JOptionPane.showInputDialog(this, "Número de identificación del empleado:");
+        if (id == null || id.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Validación: El número de identificación es obligatorio.");
+            return null;
+        }
+        id = id.trim();
+
+        if (existeIntegranteEnEquipo(equipoActual, id)) {
+            JOptionPane.showMessageDialog(this, "Validación: Ya existe un integrante con la identificación '" + id + "' en este equipo.");
+            return null;
+        }
+
+        String nombre = JOptionPane.showInputDialog(this, "Nombre completo del empleado:");
+        if (nombre == null || nombre.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Validación: El nombre completo es obligatorio.");
+            return null;
+        }
+
+        String titulo = JOptionPane.showInputDialog(this, "Título profesional del empleado:");
+        if (titulo == null || titulo.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Validación: El título profesional es obligatorio.");
+            return null;
+        }
+
+        String expStr = JOptionPane.showInputDialog(this, "Años de experiencia (0 a 60):");
+        if (expStr == null || expStr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Validación: Debe ingresar los años de experiencia.");
+            return null;
+        }
+
+        byte aniosExp;
+        try {
+            aniosExp = Byte.parseByte(expStr.trim());
+            if (aniosExp < 0) {
+                JOptionPane.showMessageDialog(this, "Validación: Los años de experiencia no pueden ser negativos.");
+                return null;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Validación: Los años de experiencia deben ser un número entero válido (tipo byte).");
+            return null;
+        }
+
+        return new Empleado(id, nombre.trim(), titulo.trim(), aniosExp);
+    }
+
+    // ==================== MAIN ====================
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            UsaProyecto ventana = new UsaProyecto();
+            ventana.setVisible(true);
+        });
+    }
 }
