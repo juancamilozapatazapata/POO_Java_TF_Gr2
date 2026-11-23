@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +22,8 @@ import static org.junit.Assert.*;
  * Pruebas unitarias con JUnit 4 para las operaciones de UsaProyecto:
  * código del proyecto, registro, consultas generales, consultas con filtro y actualización de estado.
  *
- * Nota. Los campos de texto de la ventana son privados; las pruebas los llenan por reflexión
- * y presionan el botón (invocan su manejador) como lo haría una persona.
+ * Nota. Los datos que piden las ventanas (JOptionPane) los contesta CerradorDeVentanas con las respuestas
+ * preparadas en cada prueba. Los botones se presionan invocando su manejador por reflexión.
  */
 public class PruebasOperacionesProyectoTest {
 
@@ -79,7 +79,7 @@ public class PruebasOperacionesProyectoTest {
         vista.dispose();
     }
 
-    // ==================== AYUDAS PARA LA REFLEXIÓN ====================
+    // ==================== AYUDAS PARA LA REFLEXIÓN Y PARA LAS RESPUESTAS ====================
 
     @SuppressWarnings("unchecked")
     private ArrayList<Proyecto> campoEstatico(String nombre) throws Exception {
@@ -88,14 +88,10 @@ public class PruebasOperacionesProyectoTest {
         return (ArrayList<Proyecto>) campo.get(null);
     }
 
-    private JTextField campoTexto(String nombre) throws Exception {
-        Field campo = UsaProyecto.class.getDeclaredField(nombre);
+    private JTextArea areaResultados() throws Exception {
+        Field campo = UsaProyecto.class.getDeclaredField("jTextAreaResultados");
         campo.setAccessible(true);
-        return (JTextField) campo.get(vista);
-    }
-
-    private void escribir(String nombreCampo, String texto) throws Exception {
-        campoTexto(nombreCampo).setText(texto);
+        return (JTextArea) campo.get(vista);
     }
 
     private void presionar(String manejador) throws Exception {
@@ -104,24 +100,32 @@ public class PruebasOperacionesProyectoTest {
         metodo.invoke(vista, new Object[]{null});
     }
 
-    /** Llena la ventana de registro con una empresa válida. */
-    private void llenarRegistroValido() throws Exception {
-        escribir("jTextFieldTitulo", "Sistema de gestion de inventarios");
-        escribir("jTextFieldFechaInicio", "2026-11-01");
-        escribir("jTextFieldUnidad", "meses");
-        escribir("jTextFieldDuracion", "6");
-        escribir("jTextFieldTipoCliente", "Empresa");
-        escribir("jTextFieldIdCliente", "900123");
-        escribir("jTextFieldNombreCliente", "ACME SAS");
-        escribir("jTextFieldCiudadCliente", "Cali");
-        escribir("jTextFieldTelefono", "3001112222");
-        escribir("jTextFieldCorreo", "ana@acme.com");
-        escribir("jTextFieldNombreContacto", "Ana Ruiz");
-        escribir("jTextFieldCargoContacto", "Gerente");
-        escribir("jTextFieldIdGerente", "55");
-        escribir("jTextFieldNombreGerente", "Marta Gomez");
-        escribir("jTextFieldTituloGerente", "Ingeniera");
-        escribir("jTextFieldExperienciaGerente", "8");
+    /**
+     * Respuestas, en el orden en que las pide registrarProyecto, para una empresa válida:
+     * 0 título, 1 fecha, 2 unidad, 3 duración, 4 tipo de cliente, 5 id cliente, 6 nombre cliente, 7 ciudad,
+     * 8 nombre contacto, 9 cargo contacto, 10 teléfono, 11 correo, 12 id gerente, 13 nombre gerente,
+     * 14 título gerente, 15 años de experiencia.
+     */
+    private String[] respuestasEmpresaValida() {
+        return new String[]{"Sistema de gestion de inventarios", "2026-11-01", "meses", "6", "Empresa", "900123", "ACME SAS", "Cali",
+            "Ana Ruiz", "Gerente", "3001112222", "ana@acme.com", "55", "Marta Gomez", "Ingeniera", "8"};
+    }
+
+    /**
+     * Respuestas para una persona natural válida (no se pide contacto):
+     * 0 título, 1 fecha, 2 unidad, 3 duración, 4 tipo, 5 id, 6 nombre, 7 ciudad, 8 teléfono, 9 correo,
+     * 10 id gerente, 11 nombre gerente, 12 título gerente, 13 años de experiencia.
+     */
+    private String[] respuestasPersonaValida() {
+        return new String[]{"Aplicacion movil para domicilios", "2026-12-05", "semanas", "2", "personanatural", "1144", "Luis Perez", "Bogota",
+            "3105556666", "luis@mail.com", "55", "Marta Gomez", "Ingeniera", "8"};
+    }
+
+    /** Prepara las respuestas y ejecuta registrarProyecto sobre una lista nueva; devuelve la lista resultante. */
+    private ArrayList<Proyecto> registrar(String... respuestas) {
+        ArrayList<Proyecto> registrados = new ArrayList<>();
+        cerrador.agregarEntradas(respuestas);
+        return vista.registrarProyecto(registrados);
     }
 
     // ==================== GENERAR CÓDIGO ====================
@@ -164,158 +168,246 @@ public class PruebasOperacionesProyectoTest {
     // ==================== REGISTRAR PROYECTO ====================
 
     @Test
-    public void testRegistrarProyectoConEmpresaValida() throws Exception {
-        llenarRegistroValido();
+    public void testRegistrarProyectoConEmpresaValida() {
+        ArrayList<Proyecto> registrados = registrar(respuestasEmpresaValida());
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        ArrayList<Proyecto> registrados = campoEstatico("losProyectos");
         assertEquals(1, registrados.size());
         assertEquals(LocalDate.now().getYear() + "-001", registrados.get(0).getCodigo());
         assertEquals("INICIADO", registrados.get(0).getEstado());
+        assertEquals("Sistema de gestion de inventarios", registrados.get(0).getTitulo());
+        assertEquals(LocalDate.of(2026, 11, 1), registrados.get(0).getFechaInicio());
         assertTrue(registrados.get(0).getSuCliente() instanceof Empresa);
         assertEquals("Marta Gomez", registrados.get(0).getSuGerente().getNombreCompleto());
-        assertEquals("", campoTexto("jTextFieldTitulo").getText()); // la ventana quedó limpia
+        assertEquals(0, cerrador.entradasPendientes()); // se usaron todas las respuestas
     }
 
     @Test
-    public void testRegistrarProyectoConPersonaNatural() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldTipoCliente", "personanatural");
-        escribir("jTextFieldIdCliente", "1144");
-        escribir("jTextFieldNombreCliente", "Luis Perez");
-        escribir("jTextFieldNombreContacto", "");
-        escribir("jTextFieldCargoContacto", "");
+    public void testRegistrarProyectoConPersonaNatural() {
+        ArrayList<Proyecto> registrados = registrar(respuestasPersonaValida());
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertEquals(1, campoEstatico("losProyectos").size());
-        assertTrue(campoEstatico("losProyectos").get(0).getSuCliente() instanceof PersonaNatural);
+        assertEquals(1, registrados.size());
+        assertTrue(registrados.get(0).getSuCliente() instanceof PersonaNatural);
+        assertEquals("1144", registrados.get(0).getSuCliente().getNumeroIdentificacion());
+        assertEquals("semanas", registrados.get(0).getUnidadDuracion());
     }
 
     @Test
-    public void testRegistrarDosProyectosGeneraCodigosConsecutivos() throws Exception {
-        llenarRegistroValido();
-        presionar("jButtonGuardarProyectoActionPerformed");
-        llenarRegistroValido();
-        presionar("jButtonGuardarProyectoActionPerformed");
+    public void testRegistrarDosProyectosGeneraCodigosConsecutivos() {
+        ArrayList<Proyecto> registrados = new ArrayList<>();
+        cerrador.agregarEntradas(respuestasEmpresaValida());
+        vista.registrarProyecto(registrados);
+        cerrador.agregarEntradas(respuestasEmpresaValida());
+        vista.registrarProyecto(registrados);
 
-        ArrayList<Proyecto> registrados = campoEstatico("losProyectos");
         assertEquals(2, registrados.size());
         assertTrue(registrados.get(0).getCodigo().endsWith("-001"));
         assertTrue(registrados.get(1).getCodigo().endsWith("-002"));
     }
 
     @Test
-    public void testRegistrarConTituloCortoNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldTitulo", "corto");
+    public void testRegistrarConTituloCortoVuelveAPedirloYNoRegistraSiSeCancela() {
+        ArrayList<Proyecto> registrados = registrar("corto");   // luego no hay más respuestas: se cancela
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertTrue(registrados.isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: título")); // avisó el error
     }
 
     @Test
-    public void testRegistrarConTituloMuyLargoNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldTitulo", "x".repeat(101));
+    public void testRegistrarConTituloMuyLargoVuelveAPedirloYNoRegistraSiSeCancela() {
+        ArrayList<Proyecto> registrados = registrar("x".repeat(101));
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertTrue(registrados.isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: título"));
     }
 
     @Test
-    public void testRegistrarConFechaMalFormadaNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldFechaInicio", "01/11/2026");
+    public void testRegistrarConTituloInvalidoYLuegoValidoSiRegistra() {
+        String[] respuestas = respuestasEmpresaValida();
+        String[] conErrorAntes = new String[respuestas.length + 1];
+        conErrorAntes[0] = "corto";                      // primer intento: inválido
+        System.arraycopy(respuestas, 0, conErrorAntes, 1, respuestas.length);
 
-        presionar("jButtonGuardarProyectoActionPerformed");
+        ArrayList<Proyecto> registrados = registrar(conErrorAntes);
 
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertEquals(1, registrados.size());
+        assertEquals("Sistema de gestion de inventarios", registrados.get(0).getTitulo());
     }
 
     @Test
-    public void testRegistrarConUnidadInvalidaNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldUnidad", "dias");
+    public void testRegistrarConUnidadInvalidaVuelveAPedirlaYNoRegistraSiSeCancela() {
+        ArrayList<Proyecto> registrados = registrar("Sistema de gestion de inventarios", "2026-11-01", "dias");
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertTrue(registrados.isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: unidad de duración"));
     }
 
     @Test
-    public void testRegistrarConDuracionFueraDeRangoNoRegistra() throws Exception {
+    public void testRegistrarConDuracionFueraDeRangoNoRegistra() {
         String[][] casos = {{"semanas", "4"}, {"semanas", "0"}, {"años", "4"}, {"meses", "12"}, {"meses", "24"}, {"meses", "36"}};
         for (String[] caso : casos) {
-            llenarRegistroValido();
-            escribir("jTextFieldUnidad", caso[0]);
-            escribir("jTextFieldDuracion", caso[1]);
+            // después del valor inválido no hay más respuestas: la ventana se vuelve a pedir y se cancela
+            ArrayList<Proyecto> registrados = registrar("Sistema de gestion de inventarios", "2026-11-01", caso[0], caso[1]);
 
-            presionar("jButtonGuardarProyectoActionPerformed");
-
-            assertTrue("No debía registrar " + caso[1] + " " + caso[0], campoEstatico("losProyectos").isEmpty());
+            assertTrue("No debía registrar " + caso[1] + " " + caso[0], registrados.isEmpty());
         }
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: duración estimada"));
     }
 
     @Test
-    public void testRegistrarConDuracionEnLosLimitesSiRegistra() throws Exception {
-        String[][] casos = {{"semanas", "1"}, {"semanas", "3"}, {"años", "1"}, {"años", "3"}, {"meses", "1"}, {"meses", "11"}, {"meses", "13"}, {"meses", "23"}, {"meses", "25"}, {"meses", "35"}};
+    public void testRegistrarConDuracionEnLosLimitesSiRegistra() {
+        String[][] casos = {{"semanas", "1"}, {"semanas", "3"}, {"años", "1"}, {"años", "3"}, {"meses", "1"}, {"meses", "11"},
+            {"meses", "13"}, {"meses", "23"}, {"meses", "25"}, {"meses", "35"}};
         for (String[] caso : casos) {
-            campoEstatico("losProyectos").clear();
-            llenarRegistroValido();
-            escribir("jTextFieldUnidad", caso[0]);
-            escribir("jTextFieldDuracion", caso[1]);
+            String[] respuestas = respuestasEmpresaValida();
+            respuestas[2] = caso[0];
+            respuestas[3] = caso[1];
 
-            presionar("jButtonGuardarProyectoActionPerformed");
+            ArrayList<Proyecto> registrados = registrar(respuestas);
 
-            assertEquals("Debía registrar " + caso[1] + " " + caso[0], 1, campoEstatico("losProyectos").size());
+            assertEquals("Debía registrar " + caso[1] + " " + caso[0], 1, registrados.size());
         }
     }
 
     @Test
-    public void testRegistrarConDuracionNoNumericaNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldDuracion", "abc");
+    public void testRegistrarConTipoDeClienteInvalidoVuelveAPedirloYNoRegistraSiSeCancela() {
+        ArrayList<Proyecto> registrados = registrar("Sistema de gestion de inventarios", "2026-11-01", "meses", "6", "Otro");
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertTrue(registrados.isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: tipo de cliente"));
     }
 
     @Test
-    public void testRegistrarConTipoDeClienteInvalidoNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldTipoCliente", "Otro");
+    public void testRegistrarSeCancelaSiElUsuarioCancelaEnCualquierPregunta() {
+        String[] completas = respuestasEmpresaValida();
+        for (int hasta = 0; hasta < completas.length; hasta++) {
+            String[] parciales = new String[hasta];
+            System.arraycopy(completas, 0, parciales, 0, hasta);   // las demás preguntas se cancelan
 
-        presionar("jButtonGuardarProyectoActionPerformed");
+            ArrayList<Proyecto> registrados = registrar(parciales);
 
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+            assertTrue("Debía cancelarse al contestar solo " + hasta + " preguntas", registrados.isEmpty());
+        }
+    }
+
+    /**
+     * Devuelve las respuestas válidas con uno o más datos inválidos insertados antes de la posición indicada:
+     * la ventana rechaza esos datos y vuelve a pedir el mismo dato hasta recibir el válido.
+     */
+    private String[] conErrorAntes(String[] validas, int posicion, String... invalidos) {
+        String[] resultado = new String[validas.length + invalidos.length];
+        System.arraycopy(validas, 0, resultado, 0, posicion);
+        System.arraycopy(invalidos, 0, resultado, posicion, invalidos.length);
+        System.arraycopy(validas, posicion, resultado, posicion + invalidos.length, validas.length - posicion);
+        return resultado;
     }
 
     @Test
-    public void testRegistrarConExperienciaNoNumericaNoRegistra() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldExperienciaGerente", "ocho");
+    public void testRegistrarConFechaMalFormadaVuelveAPedirlaYLuegoRegistra() {
+        ArrayList<Proyecto> registrados = registrar(conErrorAntes(respuestasEmpresaValida(), 1, "01/11/2026", "2026-13-45", "hoy"));
 
-        presionar("jButtonGuardarProyectoActionPerformed");
-
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+        assertEquals(1, registrados.size());
+        assertEquals(LocalDate.of(2026, 11, 1), registrados.get(0).getFechaInicio());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: fecha de inicio"));
+        assertEquals(0, cerrador.entradasPendientes());
     }
 
     @Test
-    public void testDespuesDeUnErrorSePuedeRegistrarDeNuevo() throws Exception {
-        llenarRegistroValido();
-        escribir("jTextFieldTitulo", "corto");
-        presionar("jButtonGuardarProyectoActionPerformed");
-        assertTrue(campoEstatico("losProyectos").isEmpty());
+    public void testRegistrarConFechaMalFormadaYSeCancelaNoRegistra() {
+        ArrayList<Proyecto> registrados = registrar("Sistema de gestion de inventarios", "01/11/2026");
 
-        escribir("jTextFieldTitulo", "Sistema de gestion de inventarios");
-        presionar("jButtonGuardarProyectoActionPerformed");
+        assertTrue(registrados.isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: fecha de inicio"));
+    }
+
+    @Test
+    public void testRegistrarConDuracionNoNumericaVuelveAPedirlaYLuegoRegistra() {
+        ArrayList<Proyecto> registrados = registrar(conErrorAntes(respuestasEmpresaValida(), 3, "abc", "", "2.5"));
+
+        assertEquals(1, registrados.size());
+        assertEquals(6, registrados.get(0).getDuracionEstimada());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: duración estimada"));
+        assertEquals(0, cerrador.entradasPendientes());
+    }
+
+    @Test
+    public void testRegistrarConDuracionNoNumericaYSeCancelaNoRegistra() {
+        ArrayList<Proyecto> registrados = registrar("Sistema de gestion de inventarios", "2026-11-01", "meses", "abc");
+
+        assertTrue(registrados.isEmpty());
+    }
+
+    @Test
+    public void testRegistrarConExperienciaInvalidaVuelveAPedirlaYLuegoRegistra() {
+        // no numérica, negativa y fuera del rango de un byte
+        ArrayList<Proyecto> registrados = registrar(conErrorAntes(respuestasEmpresaValida(), 15, "ocho", "-2", "200"));
+
+        assertEquals(1, registrados.size());
+        assertEquals(8, registrados.get(0).getSuGerente().getAniosExperiencia());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: años de experiencia"));
+        assertEquals(0, cerrador.entradasPendientes());
+    }
+
+    @Test
+    public void testRegistrarConExperienciaInvalidaYSeCancelaNoRegistra() {
+        String[] respuestas = respuestasEmpresaValida();
+        respuestas[15] = "ocho";   // después no hay más respuestas: se cancela
+
+        assertTrue(registrar(respuestas).isEmpty());
+    }
+
+    @Test
+    public void testRegistrarEmpresaConDatosObligatoriosVaciosLosVuelveAPedir() {
+        // 5 id cliente, 6 nombre, 7 ciudad, 8 nombre contacto, 9 cargo, 10 teléfono, 11 correo, 12 id gerente, 13 nombre gerente, 14 título
+        for (int posicion = 5; posicion <= 14; posicion++) {
+            String[] validas = respuestasEmpresaValida();
+
+            ArrayList<Proyecto> registrados = registrar(conErrorAntes(validas, posicion, "", "   "));
+
+            assertEquals("Debía registrar tras pedir de nuevo el dato " + posicion, 1, registrados.size());
+            assertEquals("No se usaron todas las respuestas en el dato " + posicion, 0, cerrador.entradasPendientes());
+        }
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: nombre del contacto"));
+    }
+
+    @Test
+    public void testRegistrarPersonaConDatosObligatoriosVaciosLosVuelveAPedir() {
+        // 5 id cliente, 6 nombre, 7 ciudad, 8 teléfono, 9 correo, 10 id gerente, 11 nombre gerente, 12 título
+        for (int posicion = 5; posicion <= 12; posicion++) {
+            ArrayList<Proyecto> registrados = registrar(conErrorAntes(respuestasPersonaValida(), posicion, "", "   "));
+
+            assertEquals("Debía registrar tras pedir de nuevo el dato " + posicion, 1, registrados.size());
+            assertEquals(0, cerrador.entradasPendientes());
+        }
+    }
+
+    @Test
+    public void testRegistrarConDatoObligatorioVacioYSeCancelaNoRegistra() {
+        String[] respuestas = respuestasEmpresaValida();
+        respuestas[12] = "";   // id del gerente vacío; después no hay más respuestas
+
+        assertTrue(registrar(respuestas).isEmpty());
+        assertTrue(cerrador.seMostro("REGISTRAR PROYECTO: identificación del gerente"));
+    }
+
+    @Test
+    public void testAlCorregirUnDatoSeConservanLosAnteriores() {
+        ArrayList<Proyecto> registrados = registrar(conErrorAntes(respuestasEmpresaValida(), 15, "ocho"));
+
+        assertEquals(1, registrados.size());
+        Proyecto registrado = registrados.get(0);
+        assertEquals("Sistema de gestion de inventarios", registrado.getTitulo());
+        assertEquals("ACME SAS", registrado.getSuCliente().getNombre());
+        assertEquals("Marta Gomez", registrado.getSuGerente().getNombreCompleto());
+    }
+
+    @Test
+    public void testElBotonRegistrarAgregaElProyectoALaLista() throws Exception {
+        cerrador.agregarEntradas(respuestasEmpresaValida());
+
+        presionar("jButtonRegistrarActionPerformed");
 
         assertEquals(1, campoEstatico("losProyectos").size());
+        assertEquals("INICIADO", campoEstatico("losProyectos").get(0).getEstado());
     }
 
     // ==================== CONSULTAS GENERALES ====================
@@ -508,27 +600,24 @@ public class PruebasOperacionesProyectoTest {
     // ==================== ACTUALIZAR ESTADO ====================
 
     @Test
-    public void testActualizarEstadoConListaVacia() throws Exception {
-        escribir("jTextFieldNuevoEstado", "EN CURSO");
+    public void testActualizarEstadoConListaVacia() {
         String resultado = vista.actualizarEstadoProyectoDadoCodigo(new ArrayList<Proyecto>(), "2026-001");
         assertTrue(resultado.contains("No hay proyectos registrados."));
     }
 
     @Test
-    public void testActualizarEstadoDeUnProyecto() throws Exception {
-        escribir("jTextFieldNuevoEstado", "EN CURSO");
+    public void testActualizarEstadoDeUnProyecto() {
+        cerrador.agregarEntradas("EN CURSO");
 
         String resultado = vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-001");
 
         assertTrue(resultado.contains("Operación exitosa"));
         assertEquals("EN CURSO", p1.getEstado());
-        assertEquals("EN CURSO", p2.getEstado()); // no cambió: ya estaba así
-        assertEquals("EN CURSO", p3.getEstado());
     }
 
     @Test
-    public void testActualizarEstadoSoloCambiaElProyectoIndicado() throws Exception {
-        escribir("jTextFieldNuevoEstado", "SUSPENDIDO");
+    public void testActualizarEstadoSoloCambiaElProyectoIndicado() {
+        cerrador.agregarEntradas("SUSPENDIDO");
 
         vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-002");
 
@@ -538,8 +627,8 @@ public class PruebasOperacionesProyectoTest {
     }
 
     @Test
-    public void testActualizarEstadoAceptaMinusculasYEspacios() throws Exception {
-        escribir("jTextFieldNuevoEstado", "  finalizado ");
+    public void testActualizarEstadoAceptaMinusculasYEspacios() {
+        cerrador.agregarEntradas("  finalizado ");
 
         vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-001");
 
@@ -547,10 +636,10 @@ public class PruebasOperacionesProyectoTest {
     }
 
     @Test
-    public void testActualizarEstadoAceptaLosSeisEstadosDelEnunciado() throws Exception {
+    public void testActualizarEstadoAceptaLosSeisEstadosDelEnunciado() {
         String[] estados = {"INICIADO", "EN CURSO", "CANCELADO", "FINALIZADO", "SUSPENDIDO", "APLAZADO"};
         for (String estado : estados) {
-            escribir("jTextFieldNuevoEstado", estado);
+            cerrador.agregarEntradas(estado);
 
             vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-001");
 
@@ -559,46 +648,125 @@ public class PruebasOperacionesProyectoTest {
     }
 
     @Test
-    public void testActualizarEstadoInvalidoNoCambiaNada() throws Exception {
-        escribir("jTextFieldNuevoEstado", "PAUSADO");
+    public void testActualizarEstadoInvalidoVuelveAPedirloYNoCambiaSiSeCancela() {
+        cerrador.agregarEntradas("PAUSADO");   // luego no hay más respuestas: se cancela
 
         String resultado = vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-001");
 
-        assertTrue(resultado.contains("Estado inválido"));
+        assertTrue(resultado.contains("Actualización cancelada."));
         assertEquals("INICIADO", p1.getEstado());
+        assertTrue(cerrador.seMostro("ACTUALIZAR ESTADO: nuevo estado"));
     }
 
     @Test
-    public void testActualizarEstadoDeCodigoInexistente() throws Exception {
-        escribir("jTextFieldNuevoEstado", "EN CURSO");
+    public void testActualizarEstadoInvalidoYLuegoValidoSiCambia() {
+        cerrador.agregarEntradas("PAUSADO", "APLAZADO");
+
+        vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-001");
+
+        assertEquals("APLAZADO", p1.getEstado());
+    }
+
+    @Test
+    public void testActualizarEstadoDeCodigoInexistente() {
+        cerrador.agregarEntradas("EN CURSO");
 
         String resultado = vista.actualizarEstadoProyectoDadoCodigo(lista, "2026-999");
 
         assertTrue(resultado.contains("No hay proyectos con el código indicado."));
         assertEquals("INICIADO", p1.getEstado());
+        assertEquals(1, cerrador.entradasPendientes()); // ni siquiera pidió el nuevo estado
     }
 
     @Test
-    public void testElBotonActualizarEstadoConCamposVaciosNoCambiaNada() throws Exception {
+    public void testElBotonEstadoCambiaElProyecto() throws Exception {
         campoEstatico("losProyectos").add(p1);
-        escribir("jTextFieldCodigoEstado", "");
-        escribir("jTextFieldNuevoEstado", "EN CURSO");
+        cerrador.agregarEntradas("2026-001", "CANCELADO");
 
-        presionar("jButtonActualizarEstadoActionPerformed");
+        presionar("jButtonEstadoActionPerformed");
+
+        assertEquals("CANCELADO", p1.getEstado());
+    }
+
+    @Test
+    public void testElBotonEstadoConCodigoVacioNoCambiaNada() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        cerrador.agregarEntradas("   ", "CANCELADO");
+
+        presionar("jButtonEstadoActionPerformed");
 
         assertEquals("INICIADO", p1.getEstado());
         assertTrue(cerrador.seMostro("ENTRADA INVÁLIDA"));
     }
 
+    // ==================== BOTÓN EQUIPO (MENÚ) ====================
+
     @Test
-    public void testElBotonActualizarEstadoCambiaElProyecto() throws Exception {
+    public void testElBotonEquipoRegistraUnIntegrante() throws Exception {
         campoEstatico("losProyectos").add(p1);
-        escribir("jTextFieldCodigoEstado", "2026-001");
-        escribir("jTextFieldNuevoEstado", "CANCELADO");
+        cerrador.agregarEntradas("1", "2026-001", "10", "Pedro Soto", "Ingeniero", "6");
 
-        presionar("jButtonActualizarEstadoActionPerformed");
+        presionar("jButtonEquipoActionPerformed");
 
-        assertEquals("CANCELADO", p1.getEstado());
-        assertEquals("", campoTexto("jTextFieldNuevoEstado").getText()); // la ventana quedó limpia
+        assertEquals(1, p1.getSuEquipo().size());
+        assertEquals("Pedro Soto", p1.getSuEquipo().get(0).getNombreCompleto());
+    }
+
+    @Test
+    public void testElBotonEquipoRegistraElEquipo() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        // opción 2, código, cantidad 2 y los datos de dos integrantes; la pregunta "otro adicional" se cierra como "no"
+        cerrador.agregarEntradas("2", "2026-001", "2", "10", "Pedro Soto", "Ingeniero", "6", "11", "Sara Mora", "Disenadora", "4");
+
+        presionar("jButtonEquipoActionPerformed");
+
+        assertEquals(2, p1.getSuEquipo().size());
+    }
+
+    @Test
+    public void testElBotonEquipoConsultaElEquipo() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        p1.agregarIntegrante(new Empleado("10", "Pedro Soto", "Ingeniero", (byte) 6));
+        cerrador.agregarEntradas("3", "2026-001");
+
+        presionar("jButtonEquipoActionPerformed");
+
+        assertTrue(areaResultados().getText().contains("Pedro Soto"));
+        assertTrue(areaResultados().getText().contains("INTEGRANTES DEL EQUIPO (1)"));
+    }
+
+    @Test
+    public void testElBotonEquipoEliminaUnIntegrante() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        p1.agregarIntegrante(new Empleado("10", "Pedro Soto", "Ingeniero", (byte) 6));
+        p1.agregarIntegrante(new Empleado("11", "Sara Mora", "Disenadora", (byte) 4));
+        cerrador.agregarEntradas("4", "2026-001", "10");
+
+        presionar("jButtonEquipoActionPerformed");
+
+        assertEquals(1, p1.getSuEquipo().size());
+        assertEquals("11", p1.getSuEquipo().get(0).getNumeroIdentificacion());
+    }
+
+    @Test
+    public void testElBotonEquipoConOpcionInvalidaNoHaceNada() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        cerrador.agregarEntradas("9", "2026-001");
+
+        presionar("jButtonEquipoActionPerformed");
+
+        assertNull(p1.getSuEquipo());
+        assertTrue(cerrador.seMostro("EQUIPO DEL PROYECTO"));
+        assertEquals(1, cerrador.entradasPendientes()); // no llegó a pedir el código
+    }
+
+    @Test
+    public void testElBotonEquipoConOpcionNoNumericaNoHaceNada() throws Exception {
+        campoEstatico("losProyectos").add(p1);
+        cerrador.agregarEntradas("abc");
+
+        presionar("jButtonEquipoActionPerformed");
+
+        assertNull(p1.getSuEquipo());
     }
 }
