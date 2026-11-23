@@ -39,29 +39,6 @@ public class UsaProyecto extends javax.swing.JFrame {
     private static ArrayList<Proyecto> losProyectos = new ArrayList<>();
     private static ArrayList<Cliente> losClientes = new ArrayList<>();
 
-    boolean registroValido = true;
-    private javax.swing.JDialog jDialogEquipo;
-    private javax.swing.JDialog jDialogEstado;
-    private JTextField jTextFieldCodigoEstado;
-    private JTextField jTextFieldNuevoEstado;
-    private JTextField jTextFieldCodigoEquipo;
-    private javax.swing.JDialog jDialogRegistro;
-    private JTextField jTextFieldTitulo;
-    private JTextField jTextFieldFechaInicio;
-    private JTextField jTextFieldUnidad;
-    private JTextField jTextFieldDuracion;
-    private JTextField jTextFieldTipoCliente;
-    private JTextField jTextFieldIdCliente;
-    private JTextField jTextFieldNombreCliente;
-    private JTextField jTextFieldCiudadCliente;
-    private JTextField jTextFieldTelefono;
-    private JTextField jTextFieldCorreo;
-    private JTextField jTextFieldNombreContacto;
-    private JTextField jTextFieldCargoContacto;
-    private JTextField jTextFieldIdGerente;
-    private JTextField jTextFieldNombreGerente;
-    private JTextField jTextFieldTituloGerente;
-    private JTextField jTextFieldExperienciaGerente;
 
     
     /*****************************************************/
@@ -71,9 +48,6 @@ public class UsaProyecto extends javax.swing.JFrame {
  /************************************/   
     public UsaProyecto() throws HeadlessException{
         initComponents();
-        crearDialogoRegistro();
-        crearDialogoEquipo();
-        crearDialogoEstado();
     }
 
     public UsaProyecto(GraphicsConfiguration gc) {
@@ -117,185 +91,270 @@ public class UsaProyecto extends javax.swing.JFrame {
     }
 
     /*
-     * Método registrarProyecto. Obtiene los datos desde los campos de texto, crea el proyecto y lo agrega a la colección.
-     * Nota. Se utiliza "registroValido" como variable de control para validaciones y gestión de excepciones de datos de entrada.
+     * Método registrarProyecto. Solicita los datos del proyecto, crea el objeto y lo agrega a la colección.
+     * Cada dato se valida en el momento: si es inválido se informa y se vuelve a solicitar.
+     * Nota. Si el usuario cancela una entrada, el registro se cancela y la colección queda igual.
     */
     public ArrayList<Proyecto> registrarProyecto(ArrayList<Proyecto> datos){
         //1. Obtención de los datos del proyecto
         String codigo = generarCodigoProyecto(datos);
         String titulo;
+        String textoFecha;
         LocalDate fechaInicio = null;
+        boolean fechaValida;
         String unidadDuracion;
+        String textoDuracion;
         int duracionEstimada = 0;
+        boolean duracionValida;
         String tipoCliente;
         String idCliente;
         String nombreCliente;
         String ciudadCliente;
+        String nombreContacto = "";
+        String cargoContacto = "";
         String telefono;
         String correo;
-        String nombreContacto;
-        String cargoContacto;
         String idGerente;
         String nombreGerente;
         String tituloGerente;
-        int aniosExperiencia = 0;
+        String textoExperiencia;
+        byte aniosExperiencia = 0;
+        boolean experienciaValida;
 
-        titulo = jTextFieldTitulo.getText();
-        if(titulo.isEmpty() || titulo.isBlank() || titulo.length()<20 || titulo.length()>100){
-            JOptionPane.showMessageDialog(null, "Error, campo vacío o longitud incorrecta.", "TÍTULO: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-
-        try{
-            fechaInicio = LocalDate.parse(jTextFieldFechaInicio.getText());
-        } catch(DateTimeException dtex){
-            JOptionPane.showMessageDialog(null, "Error, formato de fecha incorrecto (aaaa-mm-dd).", "FECHA INICIO: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-
-        unidadDuracion = jTextFieldUnidad.getText().toLowerCase();
-        if(!unidadDuracion.equals("semanas") && !unidadDuracion.equals("meses") && !unidadDuracion.equals("años")){
-            JOptionPane.showMessageDialog(null, "Error, valor incorrecto.", "UNIDAD DURACIÓN: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-
-        try{
-            duracionEstimada = Integer.parseInt(jTextFieldDuracion.getText());
-        } catch(NumberFormatException nfex){
-            JOptionPane.showMessageDialog(null, "Error en tipo de dato", "DURACIÓN: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-        if(unidadDuracion.equals("semanas") || unidadDuracion.equals("años")){
-            if(duracionEstimada<1 || duracionEstimada>3){
-                JOptionPane.showMessageDialog(null, "Error, valor incorrecto", "DURACIÓN: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-                registroValido = false;
+            //Validación por obligatoriedad y longitud
+        do{
+            titulo = JOptionPane.showInputDialog("Título del proyecto, obligatorio, entre 20 y 100 caracteres");
+            if(titulo == null){
+                return datos;
             }
-        }
-        if(unidadDuracion.equals("meses")){
-            if(duracionEstimada<1 || duracionEstimada>35 || duracionEstimada==12 || duracionEstimada==24){
-                JOptionPane.showMessageDialog(null, "Error, valor incorrecto", "DURACIÓN: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-                registroValido = false;
+            if(titulo.isEmpty() || titulo.isBlank() || titulo.length()<20 || titulo.length()>100){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío o no cumple la longitud exigida.\n",
+                                            "REGISTRAR PROYECTO: título", JOptionPane.ERROR_MESSAGE);
             }
-        }
+        } while(titulo.isEmpty() || titulo.isBlank() || titulo.length()<20 || titulo.length()>100);
 
-        tipoCliente = jTextFieldTipoCliente.getText().toUpperCase();
-        if(!tipoCliente.equals("EMPRESA") && !tipoCliente.equals("PERSONANATURAL")){
-            JOptionPane.showMessageDialog(null, "Error, valor incorrecto.", "TIPO CLIENTE: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-
-        idCliente = jTextFieldIdCliente.getText();
-        nombreCliente = jTextFieldNombreCliente.getText();
-        ciudadCliente = jTextFieldCiudadCliente.getText();
-        telefono = jTextFieldTelefono.getText();
-        correo = jTextFieldCorreo.getText();
-        nombreContacto = jTextFieldNombreContacto.getText();
-        cargoContacto = jTextFieldCargoContacto.getText();
-        idGerente = jTextFieldIdGerente.getText();
-        nombreGerente = jTextFieldNombreGerente.getText();
-        tituloGerente = jTextFieldTituloGerente.getText();
-
-        try{
-            aniosExperiencia = Integer.parseInt(jTextFieldExperienciaGerente.getText());
-        } catch(NumberFormatException nfex){
-            JOptionPane.showMessageDialog(null, "Error en tipo de dato", "EXPERIENCIA: ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-            registroValido = false;
-        }
-
-        if(registroValido){
-            //2. Crear el objeto proyecto (con su cliente y su gerente)
-            Cliente suCliente;
-            if(tipoCliente.equals("EMPRESA")){
-                Contacto suContacto = new Contacto(nombreContacto, cargoContacto, telefono, correo);
-                suCliente = new Empresa(suContacto, idCliente, nombreCliente, ciudadCliente);
-            } else{
-                suCliente = new PersonaNatural(idCliente, nombreCliente, ciudadCliente, telefono, correo);
+            //Gestión de excepción de formato de fecha
+        do{
+            textoFecha = JOptionPane.showInputDialog("Fecha de inicio (aaaa-mm-dd)");
+            if(textoFecha == null){
+                return datos;
             }
-            Empleado suGerente = new Empleado(idGerente, nombreGerente, tituloGerente, (byte) aniosExperiencia);
-            Proyecto objeto = new Proyecto(codigo, titulo, fechaInicio, unidadDuracion, (byte) duracionEstimada, suCliente, suGerente, "INICIADO");
+            try{
+                fechaInicio = LocalDate.parse(textoFecha.trim());
+                fechaValida = true;
+            } catch(DateTimeException dtex){
+                fechaValida = false;
+                JOptionPane.showMessageDialog(null, "Entrada inválida por formato incorrecto, use aaaa-mm-dd.\n"
+                                            + dtex.getMessage(), "REGISTRAR PROYECTO: fecha de inicio", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!fechaValida);
 
-            //3. Agregar el objeto proyecto a la colección
-            datos.add(objeto);
+            //Validación para restricción de dominio
+        do{
+            unidadDuracion = JOptionPane.showInputDialog("Unidad de duración (semanas, meses, años)");
+            if(unidadDuracion == null){
+                return datos;
+            }
+            unidadDuracion = unidadDuracion.trim().toLowerCase();
+            if(!unidadDuracion.equals("semanas") && !unidadDuracion.equals("meses") && !unidadDuracion.equals("años")){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: use semanas, meses o años.\n",
+                                            "REGISTRAR PROYECTO: unidad de duración", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!unidadDuracion.equals("semanas") && !unidadDuracion.equals("meses") && !unidadDuracion.equals("años"));
 
+            //Gestión de excepción de formato numérico y validación para restricción de dominio
+        do{
+            textoDuracion = JOptionPane.showInputDialog("Duración estimada, en " + unidadDuracion
+                                                      + "\n(semanas y años: 1 a 3; meses: 1 a 11, 13 a 23 o 25 a 35)");
+            if(textoDuracion == null){
+                return datos;
+            }
+            try{
+                duracionEstimada = Integer.parseInt(textoDuracion.trim());
+                if(unidadDuracion.equals("meses")){
+                    duracionValida = (duracionEstimada>=1 && duracionEstimada<=11) || (duracionEstimada>=13 && duracionEstimada<=23)
+                                     || (duracionEstimada>=25 && duracionEstimada<=35);
+                } else{
+                    duracionValida = duracionEstimada>=1 && duracionEstimada<=3;
+                }
+                if(!duracionValida){
+                    JOptionPane.showMessageDialog(null, "Entrada inválida por valor incorrecto.\n",
+                                                "REGISTRAR PROYECTO: duración estimada", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch(NumberFormatException nfex){
+                duracionValida = false;
+                JOptionPane.showMessageDialog(null, "Entrada inválida por formato incorrecto, ingrese un número entero.\n"
+                                            + nfex.getMessage(), "REGISTRAR PROYECTO: duración estimada", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!duracionValida);
+
+            //Datos del cliente
+        do{
+            tipoCliente = JOptionPane.showInputDialog("Tipo de cliente (Empresa, PersonaNatural)");
+            if(tipoCliente == null){
+                return datos;
+            }
+            tipoCliente = tipoCliente.trim().toUpperCase();
+            if(!tipoCliente.equals("EMPRESA") && !tipoCliente.equals("PERSONANATURAL")){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: use Empresa o PersonaNatural.\n",
+                                            "REGISTRAR PROYECTO: tipo de cliente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!tipoCliente.equals("EMPRESA") && !tipoCliente.equals("PERSONANATURAL"));
+
+        do{
+            idCliente = JOptionPane.showInputDialog("Número de identificación del cliente, obligatorio");
+            if(idCliente == null){
+                return datos;
+            }
+            if(idCliente.isEmpty() || idCliente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: identificación del cliente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(idCliente.isEmpty() || idCliente.isBlank());
+
+        do{
+            nombreCliente = JOptionPane.showInputDialog("Nombre del cliente, obligatorio");
+            if(nombreCliente == null){
+                return datos;
+            }
+            if(nombreCliente.isEmpty() || nombreCliente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: nombre del cliente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(nombreCliente.isEmpty() || nombreCliente.isBlank());
+
+        do{
+            ciudadCliente = JOptionPane.showInputDialog("Ciudad del cliente, obligatorio");
+            if(ciudadCliente == null){
+                return datos;
+            }
+            if(ciudadCliente.isEmpty() || ciudadCliente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: ciudad del cliente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(ciudadCliente.isEmpty() || ciudadCliente.isBlank());
+
+        if(tipoCliente.equals("EMPRESA")){
+            do{
+                nombreContacto = JOptionPane.showInputDialog("Nombre completo del contacto de la empresa, obligatorio");
+                if(nombreContacto == null){
+                    return datos;
+                }
+                if(nombreContacto.isEmpty() || nombreContacto.isBlank()){
+                    JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                                "REGISTRAR PROYECTO: nombre del contacto", JOptionPane.ERROR_MESSAGE);
+                }
+            } while(nombreContacto.isEmpty() || nombreContacto.isBlank());
+
+            do{
+                cargoContacto = JOptionPane.showInputDialog("Cargo del contacto de la empresa, obligatorio");
+                if(cargoContacto == null){
+                    return datos;
+                }
+                if(cargoContacto.isEmpty() || cargoContacto.isBlank()){
+                    JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                                "REGISTRAR PROYECTO: cargo del contacto", JOptionPane.ERROR_MESSAGE);
+                }
+            } while(cargoContacto.isEmpty() || cargoContacto.isBlank());
         }
+
+        do{
+            telefono = JOptionPane.showInputDialog("Teléfono (del cliente o del contacto), obligatorio");
+            if(telefono == null){
+                return datos;
+            }
+            if(telefono.isEmpty() || telefono.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: teléfono", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(telefono.isEmpty() || telefono.isBlank());
+
+        do{
+            correo = JOptionPane.showInputDialog("Correo electrónico (del cliente o del contacto), obligatorio");
+            if(correo == null){
+                return datos;
+            }
+            if(correo.isEmpty() || correo.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: correo electrónico", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(correo.isEmpty() || correo.isBlank());
+
+            //Datos del gerente
+        do{
+            idGerente = JOptionPane.showInputDialog("Número de identificación del gerente, obligatorio");
+            if(idGerente == null){
+                return datos;
+            }
+            if(idGerente.isEmpty() || idGerente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: identificación del gerente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(idGerente.isEmpty() || idGerente.isBlank());
+
+        do{
+            nombreGerente = JOptionPane.showInputDialog("Nombre completo del gerente, obligatorio");
+            if(nombreGerente == null){
+                return datos;
+            }
+            if(nombreGerente.isEmpty() || nombreGerente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: nombre del gerente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(nombreGerente.isEmpty() || nombreGerente.isBlank());
+
+        do{
+            tituloGerente = JOptionPane.showInputDialog("Título profesional del gerente, obligatorio");
+            if(tituloGerente == null){
+                return datos;
+            }
+            if(tituloGerente.isEmpty() || tituloGerente.isBlank()){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: dato vacío.\n",
+                                            "REGISTRAR PROYECTO: título profesional del gerente", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(tituloGerente.isEmpty() || tituloGerente.isBlank());
+
+        do{
+            textoExperiencia = JOptionPane.showInputDialog("Años de experiencia del gerente (0 o más)");
+            if(textoExperiencia == null){
+                return datos;
+            }
+            try{
+                aniosExperiencia = Byte.parseByte(textoExperiencia.trim());
+                experienciaValida = aniosExperiencia>=0;
+                if(!experienciaValida){
+                    JOptionPane.showMessageDialog(null, "Entrada inválida por valor incorrecto.\n",
+                                                "REGISTRAR PROYECTO: años de experiencia", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch(NumberFormatException nfex){
+                experienciaValida = false;
+                JOptionPane.showMessageDialog(null, "Entrada inválida por formato incorrecto, ingrese un número entero.\n"
+                                            + nfex.getMessage(), "REGISTRAR PROYECTO: años de experiencia", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!experienciaValida);
+
+        //2. Crear el objeto proyecto (con su cliente y su gerente, estado por defecto: INICIADO)
+        Cliente suCliente;
+        if(tipoCliente.equals("EMPRESA")){
+            Contacto suContacto = new Contacto(nombreContacto, cargoContacto, telefono, correo);
+            suCliente = new Empresa(suContacto, idCliente, nombreCliente, ciudadCliente);
+        } else{
+            suCliente = new PersonaNatural(idCliente, nombreCliente, ciudadCliente, telefono, correo);
+        }
+        Empleado suGerente = new Empleado(idGerente, nombreGerente, tituloGerente, aniosExperiencia);
+        Proyecto objeto = new Proyecto(codigo, titulo, fechaInicio, unidadDuracion, (byte) duracionEstimada, suCliente, suGerente, "INICIADO");
+
+        //3. Agregar el objeto proyecto a la colección
+        if(datos.add(objeto)){
+            JOptionPane.showMessageDialog(null, "Operación exitosa, proyecto registrado con el código " + codigo,
+                                        "REGISTRAR PROYECTO", JOptionPane.INFORMATION_MESSAGE);
+        } else{
+            JOptionPane.showMessageDialog(null, "Operación fallida, proyecto no registrado.",
+                                        "REGISTRAR PROYECTO", JOptionPane.ERROR_MESSAGE);
+        }
+
         //4. Devolver la colección
         return datos;
-    }
-
-    /*
-     * Ventana con los campos de texto para registrar un proyecto. Se abre con el botón "Registrar".
-    */
-    private void crearDialogoRegistro(){
-        jTextFieldTitulo = new JTextField();
-        jTextFieldFechaInicio = new JTextField();
-        jTextFieldUnidad = new JTextField();
-        jTextFieldDuracion = new JTextField();
-        jTextFieldTipoCliente = new JTextField();
-        jTextFieldIdCliente = new JTextField();
-        jTextFieldNombreCliente = new JTextField();
-        jTextFieldCiudadCliente = new JTextField();
-        jTextFieldTelefono = new JTextField();
-        jTextFieldCorreo = new JTextField();
-        jTextFieldNombreContacto = new JTextField();
-        jTextFieldCargoContacto = new JTextField();
-        jTextFieldIdGerente = new JTextField();
-        jTextFieldNombreGerente = new JTextField();
-        jTextFieldTituloGerente = new JTextField();
-        jTextFieldExperienciaGerente = new JTextField();
-
-        String[] etiquetas = {"Título (20 a 100 caracteres)", "Fecha inicio (aaaa-mm-dd)", "Unidad (semanas, meses, años)", "Duración estimada",
-                              "Tipo de cliente (Empresa, PersonaNatural)", "ID cliente", "Nombre cliente", "Ciudad cliente",
-                              "Teléfono (cliente o contacto)", "Correo (cliente o contacto)", "Nombre contacto (solo Empresa)", "Cargo contacto (solo Empresa)",
-                              "ID gerente", "Nombre gerente", "Título profesional gerente", "Años experiencia gerente"};
-        JTextField[] campos = {jTextFieldTitulo, jTextFieldFechaInicio, jTextFieldUnidad, jTextFieldDuracion,
-                               jTextFieldTipoCliente, jTextFieldIdCliente, jTextFieldNombreCliente, jTextFieldCiudadCliente,
-                               jTextFieldTelefono, jTextFieldCorreo, jTextFieldNombreContacto, jTextFieldCargoContacto,
-                               jTextFieldIdGerente, jTextFieldNombreGerente, jTextFieldTituloGerente, jTextFieldExperienciaGerente};
-
-        JPanel panelCampos = new JPanel(new java.awt.GridLayout(0, 2, 8, 6));
-        for(int i = 0; i < campos.length; i++){
-            panelCampos.add(new JLabel(etiquetas[i]));
-            panelCampos.add(campos[i]);
-        }
-        panelCampos.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JButton botonGuardar = new JButton("Guardar proyecto");
-        botonGuardar.addActionListener(this::jButtonGuardarProyectoActionPerformed);
-
-        jDialogRegistro = new javax.swing.JDialog(this, "REGISTRAR PROYECTO", true);
-        jDialogRegistro.getContentPane().add(panelCampos, java.awt.BorderLayout.CENTER);
-        jDialogRegistro.getContentPane().add(botonGuardar, java.awt.BorderLayout.SOUTH);
-        jDialogRegistro.pack();
-        jDialogRegistro.setLocationRelativeTo(this);
-
-        jButtonRegistrar.addActionListener(evt -> jDialogRegistro.setVisible(true));
-    }
-
-    private void jButtonGuardarProyectoActionPerformed(java.awt.event.ActionEvent evt){
-        losProyectos = registrarProyecto(losProyectos);
-        if(registroValido){
-            JOptionPane.showMessageDialog(null, "Proyecto registrado con éxito.");
-            jTextFieldTitulo.setText("");
-            jTextFieldFechaInicio.setText("");
-            jTextFieldUnidad.setText("");
-            jTextFieldDuracion.setText("");
-            jTextFieldTipoCliente.setText("");
-            jTextFieldIdCliente.setText("");
-            jTextFieldNombreCliente.setText("");
-            jTextFieldCiudadCliente.setText("");
-            jTextFieldTelefono.setText("");
-            jTextFieldCorreo.setText("");
-            jTextFieldNombreContacto.setText("");
-            jTextFieldCargoContacto.setText("");
-            jTextFieldIdGerente.setText("");
-            jTextFieldNombreGerente.setText("");
-            jTextFieldTituloGerente.setText("");
-            jTextFieldExperienciaGerente.setText("");
-            jDialogRegistro.setVisible(false);
-        } else{
-            JOptionPane.showMessageDialog(null, "Proyecto no registrado, entrada(s) inválidas.");
-            registroValido = true;
-        }
     }
 
     /***********************************************************************************/
@@ -758,72 +817,13 @@ public class UsaProyecto extends javax.swing.JFrame {
         return new Empleado(id, nombre.trim(), titulo.trim(), aniosExp);
     }
 
-    /***********************************************************************************/
-    /*ventana "Equipo": botones que llaman a los métodos del equipo*/
-
-    /*
-     * Ventana con el código del proyecto y los botones del equipo. Se abre con el botón "Equipo".
-    */
-    private void crearDialogoEquipo(){
-        jTextFieldCodigoEquipo = new JTextField();
-
-        JPanel panelCodigo = new JPanel(new java.awt.GridLayout(0, 2, 8, 6));
-        panelCodigo.add(new JLabel("Código del proyecto"));
-        panelCodigo.add(jTextFieldCodigoEquipo);
-        panelCodigo.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JButton botonRegistrarIntegrante = new JButton("Registrar integrante");
-        botonRegistrarIntegrante.addActionListener(this::jButtonRegistrarIntegranteActionPerformed);
-        JButton botonRegistrarEquipo = new JButton("Registrar equipo");
-        botonRegistrarEquipo.addActionListener(this::jButtonRegistrarEquipoActionPerformed);
-        JButton botonConsultarEquipo = new JButton("Consultar equipo");
-        botonConsultarEquipo.addActionListener(this::jButtonConsultarEquipoActionPerformed);
-        JButton botonEliminarIntegrante = new JButton("Retirar integrante");
-        botonEliminarIntegrante.addActionListener(this::jButtonEliminarIntegranteActionPerformed);
-
-        JPanel panelBotones = new JPanel(new java.awt.GridLayout(0, 2, 8, 6));
-        panelBotones.add(botonRegistrarIntegrante);
-        panelBotones.add(botonRegistrarEquipo);
-        panelBotones.add(botonConsultarEquipo);
-        panelBotones.add(botonEliminarIntegrante);
-        panelBotones.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-        jDialogEquipo = new javax.swing.JDialog(this, "EQUIPO DEL PROYECTO", false);
-        jDialogEquipo.getContentPane().add(panelCodigo, java.awt.BorderLayout.CENTER);
-        jDialogEquipo.getContentPane().add(panelBotones, java.awt.BorderLayout.SOUTH);
-        jDialogEquipo.pack();
-        jDialogEquipo.setLocationRelativeTo(this);
-
-        jButtonEquipo.addActionListener(evt -> jDialogEquipo.setVisible(true));
-    }
-
-    private void jButtonRegistrarIntegranteActionPerformed(java.awt.event.ActionEvent evt){
-        String respuesta = registrarIntegranteProyectoDadoCodigo(losProyectos, jTextFieldCodigoEquipo.getText());
-        jTextAreaResultados.setText(respuesta);
-        JOptionPane.showMessageDialog(this, respuesta);
-    }
-
-    private void jButtonRegistrarEquipoActionPerformed(java.awt.event.ActionEvent evt){
-        String respuesta = registrarEquipoProyectoDadoCodigo(losProyectos, jTextFieldCodigoEquipo.getText());
-        jTextAreaResultados.setText(respuesta);
-        JOptionPane.showMessageDialog(this, respuesta);
-    }
-
-    private void jButtonConsultarEquipoActionPerformed(java.awt.event.ActionEvent evt){
-        jTextAreaResultados.setText(consultarEquipoProyectoDadoCodigo(losProyectos, jTextFieldCodigoEquipo.getText()));
-    }
-
-    private void jButtonEliminarIntegranteActionPerformed(java.awt.event.ActionEvent evt){
-        String respuesta = eliminarIntegranteProyectoDadoCodigo(losProyectos, jTextFieldCodigoEquipo.getText());
-        jTextAreaResultados.setText(respuesta);
-        JOptionPane.showMessageDialog(this, respuesta);
-    }
 
     /***********************************************************************************/
     /*estado de los proyectos*/
 
     /*
-     * Método actualizarEstadoProyectoDadoCodigo. Cambia el estado del proyecto con el código indicado por el estado escrito en el campo "Nuevo estado".
+     * Método actualizarEstadoProyectoDadoCodigo. Cambia el estado del proyecto con el código indicado.
+     * El nuevo estado se solicita al usuario y debe ser uno de los estados definidos.
     */
     public String actualizarEstadoProyectoDadoCodigo(ArrayList<Proyecto> datos, String codigoProyecto){
         String resultado = "ACTUALIZACIÓN DE ESTADO DEL PROYECTO " + codigoProyecto + "\n";
@@ -831,73 +831,33 @@ public class UsaProyecto extends javax.swing.JFrame {
             resultado += "No hay proyectos registrados.";
             return resultado;
         }
-        String nuevoEstado = jTextFieldNuevoEstado.getText().trim().toUpperCase();
-        if(!nuevoEstado.equals("INICIADO") && !nuevoEstado.equals("EN CURSO") && !nuevoEstado.equals("CANCELADO")
-            && !nuevoEstado.equals("FINALIZADO") && !nuevoEstado.equals("SUSPENDIDO") && !nuevoEstado.equals("APLAZADO")){
-            resultado += "Estado inválido. Use INICIADO, EN CURSO, CANCELADO, FINALIZADO, SUSPENDIDO o APLAZADO.";
+        Proyecto proyectoEncontrado = buscarProyectoPorCodigo(datos, codigoProyecto.trim());
+        if(proyectoEncontrado == null) {
+            resultado += "No hay proyectos con el código indicado.";
             return resultado;
         }
-        boolean proyectoExiste = false;
-        for(Proyecto objeto : datos){
-            if(objeto.getCodigo().equals(codigoProyecto)){
-                proyectoExiste = true;
-                objeto.setEstado(nuevoEstado);
-                resultado += "Operación exitosa, el proyecto quedó en estado " + objeto.getEstado();
-                resultado += "\n";
+        String nuevoEstado;
+        do{
+            nuevoEstado = JOptionPane.showInputDialog("Nuevo estado del proyecto " + proyectoEncontrado.getCodigo()
+                                                    + "\n(INICIADO, EN CURSO, CANCELADO, FINALIZADO, SUSPENDIDO, APLAZADO)");
+            if(nuevoEstado == null){
+                resultado += "Actualización cancelada.";
+                return resultado;
             }
-        }
-        if(!proyectoExiste) {
-            resultado += "No hay proyectos con el código indicado.";
-        }
+            nuevoEstado = nuevoEstado.trim().toUpperCase();
+            if(!nuevoEstado.equals("INICIADO") && !nuevoEstado.equals("EN CURSO") && !nuevoEstado.equals("CANCELADO")
+                && !nuevoEstado.equals("FINALIZADO") && !nuevoEstado.equals("SUSPENDIDO") && !nuevoEstado.equals("APLAZADO")){
+                JOptionPane.showMessageDialog(null, "Entrada inválida: use INICIADO, EN CURSO, CANCELADO, FINALIZADO, SUSPENDIDO o APLAZADO.\n",
+                                            "ACTUALIZAR ESTADO: nuevo estado", JOptionPane.ERROR_MESSAGE);
+            }
+        } while(!nuevoEstado.equals("INICIADO") && !nuevoEstado.equals("EN CURSO") && !nuevoEstado.equals("CANCELADO")
+                && !nuevoEstado.equals("FINALIZADO") && !nuevoEstado.equals("SUSPENDIDO") && !nuevoEstado.equals("APLAZADO"));
+        proyectoEncontrado.setEstado(nuevoEstado);
+        resultado += "Operación exitosa, el proyecto quedó en estado " + proyectoEncontrado.getEstado();
+        resultado += "\n";
         return resultado;
     }
 
-    /*
-     * Ventana con el código del proyecto y el nuevo estado. Se abre con el botón "Estado".
-    */
-    private void crearDialogoEstado(){
-        jTextFieldCodigoEstado = new JTextField();
-        jTextFieldNuevoEstado = new JTextField();
-
-        JPanel panelCampos = new JPanel(new java.awt.GridLayout(0, 2, 8, 6));
-        panelCampos.add(new JLabel("Código del proyecto"));
-        panelCampos.add(jTextFieldCodigoEstado);
-        panelCampos.add(new JLabel("Nuevo estado"));
-        panelCampos.add(jTextFieldNuevoEstado);
-        panelCampos.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 4, 10));
-
-        JLabel ayuda = new JLabel("INICIADO, EN CURSO, CANCELADO, FINALIZADO, SUSPENDIDO, APLAZADO");
-        ayuda.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 4, 10));
-
-        JButton botonActualizar = new JButton("Actualizar estado");
-        botonActualizar.addActionListener(this::jButtonActualizarEstadoActionPerformed);
-        JPanel panelBoton = new JPanel(new java.awt.BorderLayout());
-        panelBoton.add(ayuda, java.awt.BorderLayout.NORTH);
-        panelBoton.add(botonActualizar, java.awt.BorderLayout.CENTER);
-        panelBoton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-        jDialogEstado = new javax.swing.JDialog(this, "ESTADO DEL PROYECTO", false);
-        jDialogEstado.getContentPane().add(panelCampos, java.awt.BorderLayout.CENTER);
-        jDialogEstado.getContentPane().add(panelBoton, java.awt.BorderLayout.SOUTH);
-        jDialogEstado.pack();
-        jDialogEstado.setLocationRelativeTo(this);
-
-        jButtonEstado.addActionListener(evt -> jDialogEstado.setVisible(true));
-    }
-
-    private void jButtonActualizarEstadoActionPerformed(java.awt.event.ActionEvent evt){
-        if(jTextFieldCodigoEstado.getText().isBlank() || jTextFieldNuevoEstado.getText().isBlank()){
-            JOptionPane.showMessageDialog(null, "Operación inválida, código o estado vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
-        } else{
-            String respuesta = actualizarEstadoProyectoDadoCodigo(losProyectos, jTextFieldCodigoEstado.getText());
-            jTextAreaResultados.setText(respuesta);
-            JOptionPane.showMessageDialog(this, respuesta);
-            if(respuesta.contains("Operación exitosa")){
-                jTextFieldCodigoEstado.setText("");
-                jTextFieldNuevoEstado.setText("");
-            }
-        }
-    }
 
     /***********************************************************************************/
     /*consultas*/
@@ -1149,15 +1109,9 @@ public class UsaProyecto extends javax.swing.JFrame {
 
         bloque = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         jButtonRegistrar = new javax.swing.JButton();
         jButtonEquipo = new javax.swing.JButton();
         jButtonEstado = new javax.swing.JButton();
-        jTextFieldProyecto = new javax.swing.JTextField();
-        jTextFieldIntegrante = new javax.swing.JTextField();
-        jTextFieldEquipo = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -1192,72 +1146,41 @@ public class UsaProyecto extends javax.swing.JFrame {
         jLabel1.setText("Registrar");
         jLabel1.setToolTipText("");
 
-        jLabel5.setText("Proyecto");
-        jLabel5.setToolTipText("");
-
-        jLabel6.setText("Integrante");
-        jLabel6.setToolTipText("");
-
-        jLabel7.setText("Equipo");
-
         jButtonRegistrar.setText("Registrar");
+        jButtonRegistrar.addActionListener(this::jButtonRegistrarActionPerformed);
 
         jButtonEquipo.setText("Equipo");
+        jButtonEquipo.addActionListener(this::jButtonEquipoActionPerformed);
 
         jButtonEstado.setText("Estado");
+        jButtonEstado.addActionListener(this::jButtonEstadoActionPerformed);
 
         javax.swing.GroupLayout bloqueLayout = new javax.swing.GroupLayout(bloque);
         bloque.setLayout(bloqueLayout);
         bloqueLayout.setHorizontalGroup(
             bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bloqueLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(bloqueLayout.createSequentialGroup()
-                        .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(9, 9, 9)
-                        .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldIntegrante)
-                            .addComponent(jTextFieldProyecto)))
-                    .addGroup(bloqueLayout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextFieldEquipo, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bloqueLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButtonEstado)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonEquipo)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonRegistrar)))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         bloqueLayout.setVerticalGroup(
             bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bloqueLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jTextFieldProyecto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jTextFieldIntegrante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jTextFieldEquipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(bloqueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonRegistrar)
-                    .addComponent(jButtonEquipo)
-                    .addComponent(jButtonEstado))
-                .addContainerGap())
+                    .addComponent(jButtonEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonEquipo, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(57, 57, 57))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -1267,6 +1190,7 @@ public class UsaProyecto extends javax.swing.JFrame {
 
         jTextAreaResultados.setColumns(20);
         jTextAreaResultados.setRows(5);
+        jTextAreaResultados.setEnabled(false);
         jScrollPane1.setViewportView(jTextAreaResultados);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -1490,6 +1414,88 @@ public class UsaProyecto extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+    java.util.logging.Logger.getLogger(UsaProyecto.class.getName())
+            .log(java.util.logging.Level.SEVERE, null, ex);
+}
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new UsaProyecto().setVisible(true));
+    }
+
+
+    /***********************************************************************************/
+    /*manejadores de los botones*/
+
+    private void jButtonRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarActionPerformed
+        losProyectos = registrarProyecto(losProyectos);
+    }//GEN-LAST:event_jButtonRegistrarActionPerformed
+
+    private void jButtonEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEstadoActionPerformed
+        String codigoProyecto = JOptionPane.showInputDialog("Código del proyecto a actualizar");
+        if(codigoProyecto == null || codigoProyecto.isBlank()){
+            JOptionPane.showMessageDialog(null, "Operación inválida, código vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+        } else{
+            jTextAreaResultados.setText(actualizarEstadoProyectoDadoCodigo(losProyectos, codigoProyecto));
+        }
+    }//GEN-LAST:event_jButtonEstadoActionPerformed
+
+    private void jButtonEquipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEquipoActionPerformed
+        int opcion;
+        try{
+            opcion = Integer.parseInt(JOptionPane.showInputDialog(null,
+                    "EQUIPO DEL PROYECTO\n1. Registrar un integrante\n2. Registrar el equipo\n3. Consultar el equipo\n4. Eliminar un integrante\nOpción:"));
+        } catch(NumberFormatException nfex){
+            JOptionPane.showMessageDialog(null, "Operación fallida: opción inválida.", "EQUIPO DEL PROYECTO", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if(opcion<1 || opcion>4){
+            JOptionPane.showMessageDialog(null, "Operación fallida: opción inválida.", "EQUIPO DEL PROYECTO", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String codigoProyecto = JOptionPane.showInputDialog("Código del proyecto");
+        if(codigoProyecto == null || codigoProyecto.isBlank()){
+            JOptionPane.showMessageDialog(null, "Operación inválida, código vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String respuesta;
+        switch(opcion){
+            case 1:
+                respuesta = registrarIntegranteProyectoDadoCodigo(losProyectos, codigoProyecto);
+                break;
+            case 2:
+                respuesta = registrarEquipoProyectoDadoCodigo(losProyectos, codigoProyecto);
+                break;
+            case 3:
+                respuesta = consultarEquipoProyectoDadoCodigo(losProyectos, codigoProyecto);
+                break;
+            default:
+                respuesta = eliminarIntegranteProyectoDadoCodigo(losProyectos, codigoProyecto);
+                break;
+        }
+        jTextAreaResultados.setText(respuesta);
+        if(opcion != 3){
+            JOptionPane.showMessageDialog(this, respuesta);
+        }
+    }//GEN-LAST:event_jButtonEquipoActionPerformed
+
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         jTextAreaResultados.setText(consultarPrimerProyecto(losProyectos));
     }//GEN-LAST:event_jButton4ActionPerformed
@@ -1589,42 +1595,16 @@ public class UsaProyecto extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonLeerClientesActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-    java.util.logging.Logger.getLogger(UsaProyecto.class.getName())
-            .log(java.util.logging.Level.SEVERE, null, ex);
-}
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new UsaProyecto().setVisible(true));
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bloque;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButtonConsultarDadoCodigo;
-    private javax.swing.JButton jButtonConsultarGerenteDadoCodigo;
     private javax.swing.JButton jButtonConsultarDadoIdCliente;
     private javax.swing.JButton jButtonConsultarDadoIdGerente;
     private javax.swing.JButton jButtonConsultarDadoTipoCliente;
+    private javax.swing.JButton jButtonConsultarGerenteDadoCodigo;
     private javax.swing.JButton jButtonConsultarTodos;
     private javax.swing.JButton jButtonEquipo;
     private javax.swing.JButton jButtonEstado;
@@ -1638,18 +1618,12 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextAreaResultados;
-    private javax.swing.JTextField jTextFieldEquipo;
     private javax.swing.JTextField jTextFieldFiltro;
-    private javax.swing.JTextField jTextFieldIntegrante;
-    private javax.swing.JTextField jTextFieldProyecto;
     // End of variables declaration//GEN-END:variables
 }
