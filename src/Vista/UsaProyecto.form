@@ -272,26 +272,26 @@
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                           <Component id="jButton3" max="32767" attributes="0"/>
                           <Component id="jButtonConsultarTodos" max="32767" attributes="0"/>
-                          <Component id="jButtonConsultaCODIGO" max="32767" attributes="0"/>
+                          <Component id="jButtonConsultarDadoCodigo" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jButton4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButtonConsultaGERENTE" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonConsultarGerenteDadoCodigo" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jButton5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jButtonConsultaIDGERENTE" max="32767" attributes="0"/>
-                                  <Component id="jButtonConsultaIDCLIENTE" max="32767" attributes="0"/>
+                                  <Component id="jButtonConsultarDadoIdGerente" max="32767" attributes="0"/>
+                                  <Component id="jButtonConsultarDadoIdCliente" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
                       <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                      <Component id="jButtonConsultaTIPOCLIENTE" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonConsultarDadoTipoCliente" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="jTextFieldFiltro" min="-2" pref="169" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
@@ -306,9 +306,9 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jButtonConsultarTodos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton4" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButtonConsultaGERENTE" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                              <Component id="jButtonConsultarGerenteDadoCodigo" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                               <Component id="jTextFieldFiltro" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButtonConsultaTIPOCLIENTE" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonConsultarDadoTipoCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -316,12 +316,12 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jButton3" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jButton5" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButtonConsultaIDCLIENTE" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonConsultarDadoIdCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="7" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jButtonConsultaIDGERENTE" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButtonConsultaCODIGO" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonConsultarDadoIdGerente" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButtonConsultarDadoCodigo" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -365,20 +365,20 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton5ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonConsultaCODIGO">
+            <Component class="javax.swing.JButton" name="jButtonConsultarDadoCodigo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Por c&#xf3;digo"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultaCODIGOActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultarDadoCodigoActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonConsultaGERENTE">
+            <Component class="javax.swing.JButton" name="jButtonConsultarGerenteDadoCodigo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Gerente (c&#xf3;digo)"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultaGERENTEActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultarGerenteDadoCodigoActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextFieldFiltro">
@@ -386,28 +386,28 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldFiltroActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonConsultaIDCLIENTE">
+            <Component class="javax.swing.JButton" name="jButtonConsultarDadoIdCliente">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Proyectos de Cliente (ID)"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultaIDCLIENTEActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultarDadoIdClienteActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonConsultaIDGERENTE">
+            <Component class="javax.swing.JButton" name="jButtonConsultarDadoIdGerente">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Proyectos de Gerente (ID)"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultaIDGERENTEActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultarDadoIdGerenteActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonConsultaTIPOCLIENTE">
+            <Component class="javax.swing.JButton" name="jButtonConsultarDadoTipoCliente">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Tipo de Cliente"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultaTIPOCLIENTEActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConsultarDadoTipoClienteActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

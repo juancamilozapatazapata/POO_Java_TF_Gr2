@@ -777,7 +777,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         JButton botonRegistrarEquipo = new JButton("Registrar equipo");
         botonRegistrarEquipo.addActionListener(this::jButtonRegistrarEquipoActionPerformed);
         JButton botonConsultarEquipo = new JButton("Consultar equipo");
-        botonConsultarEquipo.addActionListener(this::jButtonConsultaEQUIPOActionPerformed);
+        botonConsultarEquipo.addActionListener(this::jButtonConsultarEquipoActionPerformed);
         JButton botonEliminarIntegrante = new JButton("Retirar integrante");
         botonEliminarIntegrante.addActionListener(this::jButtonEliminarIntegranteActionPerformed);
 
@@ -809,7 +809,7 @@ public class UsaProyecto extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, respuesta);
     }
 
-    private void jButtonConsultaEQUIPOActionPerformed(java.awt.event.ActionEvent evt){
+    private void jButtonConsultarEquipoActionPerformed(java.awt.event.ActionEvent evt){
         jTextAreaResultados.setText(consultarEquipoProyectoDadoCodigo(losProyectos, jTextFieldCodigoEquipo.getText()));
     }
 
@@ -1168,12 +1168,12 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
-        jButtonConsultaCODIGO = new javax.swing.JButton();
-        jButtonConsultaGERENTE = new javax.swing.JButton();
+        jButtonConsultarDadoCodigo = new javax.swing.JButton();
+        jButtonConsultarGerenteDadoCodigo = new javax.swing.JButton();
         jTextFieldFiltro = new javax.swing.JTextField();
-        jButtonConsultaIDCLIENTE = new javax.swing.JButton();
-        jButtonConsultaIDGERENTE = new javax.swing.JButton();
-        jButtonConsultaTIPOCLIENTE = new javax.swing.JButton();
+        jButtonConsultarDadoIdCliente = new javax.swing.JButton();
+        jButtonConsultarDadoIdGerente = new javax.swing.JButton();
+        jButtonConsultarDadoTipoCliente = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jButtonGenerarProyectos = new javax.swing.JButton();
@@ -1285,22 +1285,22 @@ public class UsaProyecto extends javax.swing.JFrame {
         jButton5.setText("Ultimo");
         jButton5.addActionListener(this::jButton5ActionPerformed);
 
-        jButtonConsultaCODIGO.setText("Por código");
-        jButtonConsultaCODIGO.addActionListener(this::jButtonConsultaCODIGOActionPerformed);
+        jButtonConsultarDadoCodigo.setText("Por código");
+        jButtonConsultarDadoCodigo.addActionListener(this::jButtonConsultarDadoCodigoActionPerformed);
 
-        jButtonConsultaGERENTE.setText("Gerente (código)");
-        jButtonConsultaGERENTE.addActionListener(this::jButtonConsultaGERENTEActionPerformed);
+        jButtonConsultarGerenteDadoCodigo.setText("Gerente (código)");
+        jButtonConsultarGerenteDadoCodigo.addActionListener(this::jButtonConsultarGerenteDadoCodigoActionPerformed);
 
         jTextFieldFiltro.addActionListener(this::jTextFieldFiltroActionPerformed);
 
-        jButtonConsultaIDCLIENTE.setText("Proyectos de Cliente (ID)");
-        jButtonConsultaIDCLIENTE.addActionListener(this::jButtonConsultaIDCLIENTEActionPerformed);
+        jButtonConsultarDadoIdCliente.setText("Proyectos de Cliente (ID)");
+        jButtonConsultarDadoIdCliente.addActionListener(this::jButtonConsultarDadoIdClienteActionPerformed);
 
-        jButtonConsultaIDGERENTE.setText("Proyectos de Gerente (ID)");
-        jButtonConsultaIDGERENTE.addActionListener(this::jButtonConsultaIDGERENTEActionPerformed);
+        jButtonConsultarDadoIdGerente.setText("Proyectos de Gerente (ID)");
+        jButtonConsultarDadoIdGerente.addActionListener(this::jButtonConsultarDadoIdGerenteActionPerformed);
 
-        jButtonConsultaTIPOCLIENTE.setText("Tipo de Cliente");
-        jButtonConsultaTIPOCLIENTE.addActionListener(this::jButtonConsultaTIPOCLIENTEActionPerformed);
+        jButtonConsultarDadoTipoCliente.setText("Tipo de Cliente");
+        jButtonConsultarDadoTipoCliente.addActionListener(this::jButtonConsultarDadoTipoClienteActionPerformed);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -1313,21 +1313,21 @@ public class UsaProyecto extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonConsultarTodos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonConsultaCODIGO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonConsultarDadoCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jButton4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonConsultaGERENTE))
+                        .addComponent(jButtonConsultarGerenteDadoCodigo))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jButton5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButtonConsultaIDGERENTE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButtonConsultaIDCLIENTE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButtonConsultarDadoIdGerente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButtonConsultarDadoIdCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(5, 5, 5)
-                .addComponent(jButtonConsultaTIPOCLIENTE)
+                .addComponent(jButtonConsultarDadoTipoCliente)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jTextFieldFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32))
@@ -1340,19 +1340,19 @@ public class UsaProyecto extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jButtonConsultarTodos)
                         .addComponent(jButton4)
-                        .addComponent(jButtonConsultaGERENTE, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonConsultarGerenteDadoCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jTextFieldFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButtonConsultaTIPOCLIENTE))
+                        .addComponent(jButtonConsultarDadoTipoCliente))
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
                     .addComponent(jButton5)
-                    .addComponent(jButtonConsultaIDCLIENTE))
+                    .addComponent(jButtonConsultarDadoIdCliente))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonConsultaIDGERENTE)
-                    .addComponent(jButtonConsultaCODIGO)))
+                    .addComponent(jButtonConsultarDadoIdGerente)
+                    .addComponent(jButtonConsultarDadoCodigo)))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1502,16 +1502,16 @@ public class UsaProyecto extends javax.swing.JFrame {
         jTextAreaResultados.setText(consultarUltimoProyecto(losProyectos));
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jButtonConsultaCODIGOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaCODIGOActionPerformed
+    private void jButtonConsultarDadoCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarDadoCodigoActionPerformed
         if(jTextFieldFiltro.getText().isBlank()){
             JOptionPane.showMessageDialog(null, "Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
         } else{
             jTextAreaResultados.setText(consultarProyectoDadoCodigo(losProyectos, jTextFieldFiltro.getText()));
             jTextFieldFiltro.setText("");
         }
-    }//GEN-LAST:event_jButtonConsultaCODIGOActionPerformed
+    }//GEN-LAST:event_jButtonConsultarDadoCodigoActionPerformed
 
-    private void jButtonConsultaGERENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaGERENTEActionPerformed
+    private void jButtonConsultarGerenteDadoCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarGerenteDadoCodigoActionPerformed
     String filtroCodigo = jTextFieldFiltro.getText().trim();
 
     if(filtroCodigo.isEmpty()){
@@ -1520,34 +1520,34 @@ public class UsaProyecto extends javax.swing.JFrame {
     } else{
         jTextAreaResultados.setText(consultarGerenteProyectoDadoCodigo(losProyectos, filtroCodigo));
     }
-    }//GEN-LAST:event_jButtonConsultaGERENTEActionPerformed
+    }//GEN-LAST:event_jButtonConsultarGerenteDadoCodigoActionPerformed
 
-    private void jButtonConsultaIDCLIENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaIDCLIENTEActionPerformed
+    private void jButtonConsultarDadoIdClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarDadoIdClienteActionPerformed
         if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
             JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
         } else{
                 jTextAreaResultados.setText(consultarProyectosDadoNumIDECliente(losProyectos, jTextFieldFiltro.getText()));
                 jTextFieldFiltro.setText("");
         }                             
-    }//GEN-LAST:event_jButtonConsultaIDCLIENTEActionPerformed
+    }//GEN-LAST:event_jButtonConsultarDadoIdClienteActionPerformed
 
-    private void jButtonConsultaIDGERENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaIDGERENTEActionPerformed
+    private void jButtonConsultarDadoIdGerenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarDadoIdGerenteActionPerformed
         if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isBlank()){
             JOptionPane.showMessageDialog(null,"Operación inválida, filtro vacío.", "ENTRADA INVÁLIDA", JOptionPane.ERROR_MESSAGE);
         } else{
                 jTextAreaResultados.setText(consultarProyectosDadoNumIDEGerente(losProyectos, jTextFieldFiltro.getText()));
                 jTextFieldFiltro.setText("");
         }                                    
-    }//GEN-LAST:event_jButtonConsultaIDGERENTEActionPerformed
+    }//GEN-LAST:event_jButtonConsultarDadoIdGerenteActionPerformed
 
-    private void jButtonConsultaTIPOCLIENTEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultaTIPOCLIENTEActionPerformed
+    private void jButtonConsultarDadoTipoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarDadoTipoClienteActionPerformed
         if(jTextFieldFiltro.getText().isBlank() || jTextFieldFiltro.getText().isEmpty()){
             JOptionPane.showMessageDialog(null, "¡Operación fallida!\nNo se puede realizar la consulta.\nCategoría: entrada vacía.", "GESTIÓN CLIENTES", JOptionPane.ERROR_MESSAGE);            
         } else{
             jTextAreaResultados.setText(consultarProyectosDadoTipoCliente(losProyectos, jTextFieldFiltro.getText().toUpperCase()));    
             jTextFieldFiltro.setText("");
         }       
-    }//GEN-LAST:event_jButtonConsultaTIPOCLIENTEActionPerformed
+    }//GEN-LAST:event_jButtonConsultarDadoTipoClienteActionPerformed
 
     private void jTextFieldFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldFiltroActionPerformed
         // TODO add your handling code here:
@@ -1620,11 +1620,11 @@ public class UsaProyecto extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButtonConsultaCODIGO;
-    private javax.swing.JButton jButtonConsultaGERENTE;
-    private javax.swing.JButton jButtonConsultaIDCLIENTE;
-    private javax.swing.JButton jButtonConsultaIDGERENTE;
-    private javax.swing.JButton jButtonConsultaTIPOCLIENTE;
+    private javax.swing.JButton jButtonConsultarDadoCodigo;
+    private javax.swing.JButton jButtonConsultarGerenteDadoCodigo;
+    private javax.swing.JButton jButtonConsultarDadoIdCliente;
+    private javax.swing.JButton jButtonConsultarDadoIdGerente;
+    private javax.swing.JButton jButtonConsultarDadoTipoCliente;
     private javax.swing.JButton jButtonConsultarTodos;
     private javax.swing.JButton jButtonEquipo;
     private javax.swing.JButton jButtonEstado;
